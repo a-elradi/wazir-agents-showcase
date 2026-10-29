@@ -1,33 +1,89 @@
-# WAZIR Agent Team — Public Brief
+<p align="center">
+  <img src="media/wazir-showcase.gif" alt="WAZIR - while you sleep, your AI team is already working" width="860" />
+</p>
 
-A 12-agent AI team (1 supervisor + 11 specialists) running day-to-day e-commerce operations on [n8n](https://n8n.io): product scouting, SEO, technical/UX audits, ad management, refunds, support-knowledge-base curation, AI-quality review, and personalized sales follow-up — all under one governance layer with a global kill switch and a full audit trail.
+<h1 align="center">WAZIR Agent Department</h1>
 
-> Deployed for one of the biggest online shopping companies in the Middle East: **GLAM MODA**.
+<p align="center">
+  <strong>One supervisor. Eleven specialists. Zero idle hands.</strong><br />
+  A 12-agent AI operations team built on <a href="https://n8n.io">n8n</a>, running a three-store fashion retailer day and night.
+</p>
 
-This repo is the public brief: what each agent does, the kind of tasks it runs day to day, and the tools/tech it's built on — with short, real (sanitized) code excerpts showing the actual techniques, not just a description. For the full governance model (permission tiers, approval matrix, build sequence), see the companion [wazir-agent-department](https://github.com/a-elradi/wazir-agent-department) repo.
+<p align="center">
+  <a href="https://a-elradi.github.io/wazir-agents-showcase/"><img alt="Live site" src="https://img.shields.io/badge/live_site-a--elradi.github.io-800000?style=for-the-badge" /></a>
+  <a href="public/media/wazir-showcase.mp4"><img alt="The film" src="https://img.shields.io/badge/the_film-54_s_·_1080p-111111?style=for-the-badge" /></a>
+  <img alt="Agents" src="https://img.shields.io/badge/agents-12-B8963E?style=for-the-badge" />
+  <img alt="Workflows" src="https://img.shields.io/badge/live_workflows-81-800000?style=for-the-badge" />
+</p>
+
+---
+
+> Deployed for one of the biggest online shopping companies in the Middle East: **GLAM MODA** — Kuwait · Bahrain · USA.
+
+**[Open the showcase site →](https://a-elradi.github.io/wazir-agents-showcase/)** — the film, an interactive org chart, a dossier for every agent (tasks, tools, the real code pattern), and a working model of the kill switch you can press yourself.
+
+## What WAZIR is
+
+WAZIR (وزير, "the minister") is the only agent the owner talks to. It routes a request to whichever specialist it needs, merges their findings, reports back, and holds the team's kill switch. The eleven specialists each own one lane — product scouting, SEO, technical and UX audits, ad management, refunds, support memory, AI-quality review, sales pulse, personal sales follow-up — and never step outside it.
+
+Everything runs on n8n, thinks with Claude, and reads and writes through Shopify (three stores), Telegram, WhatsApp, Instagram, Outlook, Google Ads, Meta Ads and Google Sheets — behind one governance table and one audit trail.
 
 ## The team
 
-| Agent | Role | Core tools |
-|---|---|---|
-| [WAZIR](agents/wazir.md) | Supervisor / CEO interface | n8n Data Tables, Telegram, Shopify Admin API |
-| [NASEEJ](agents/naseej.md) | System health & audit trail | Shopify API, Meta/Microsoft Graph, Telegram |
-| [HAFEZ](agents/hafez.md) | Support knowledge base | Gemini, n8n Data Table, Telegram |
-| [RAED](agents/raed.md) | Product scouting & catalog import | Gemini/Claude, Shopify `productSet`, headless browser |
-| [KASHEF](agents/kashef.md) | SEO & content | Claude, Shopify Admin API, self-calling batch runner |
-| [TAJER](agents/tajer.md) | Sales pulse / profitability | Shopify Analytics API |
-| [RASID](agents/rasid.md) | Ad platform management | Google Ads API, Meta Ads API, Claude |
-| [FAHES](agents/fahes.md) | Technical/blackbox audit | HTTP crawler, link graph |
-| [DHAWWAQ](agents/dhawwaq.md) | Cross-store consistency & UX | Shopify Admin API (×3 stores), diff engine |
-| [AMEEN](agents/ameen.md) | Refunds | Google Sheets, idempotent webhook |
-| [MIZAN](agents/mizan.md) | AI quality & ratings | Claude, n8n Data Table, approval workflow |
-| [WASEL](agents/wasel.md) | Personal sales follow-up emails | Claude, Shopify discount API, loyalty connector |
+| # | Agent | Arabic | Role | Core tools |
+|---|---|---|---|---|
+| — | [WAZIR](agents/wazir.md) | وزير | Supervisor / CEO interface | n8n, Telegram, governance data table, Shopify Admin GraphQL × 3 |
+| 01 | [NASEEJ](agents/naseej.md) | نسيج | System health & audit trail | Shopify API, Meta / Microsoft Graph, Telegram |
+| 02 | [HAFEZ](agents/hafez.md) | حافظ | Support knowledge base | Claude, n8n Data Table, Telegram |
+| 03 | [AMEEN](agents/ameen.md) | أمين | Refunds | Google Sheets queue, idempotent webhook, Shopify |
+| 04 | [MIZAN](agents/mizan.md) | ميزان | AI quality & ratings | Claude, ratings table, approval workflow |
+| 05 | [RAED](agents/raed.md) | رائد | Product scouting & catalog import | Claude, Shopify `productSet`, headless browser |
+| 06 | [KASHEF](agents/kashef.md) | كاشف | SEO & content | Claude, Shopify Admin API, self-calling batch runner |
+| 07 | [FAHES](agents/fahes.md) | فاحص | Technical / blackbox audit | HTTP crawler, link graph |
+| 08 | [DHAWWAQ](agents/dhawwaq.md) | ذواق | Cross-store consistency & UX | Shopify Admin API × 3, diff engine |
+| 09 | [TAJER](agents/tajer.md) | تاجر | Sales pulse / profitability | Shopify Analytics API |
+| 10 | [RASID](agents/rasid.md) | راصد | Google & Meta Ads | Google Ads API, Meta Ads API, Claude |
+| 11 | [WASEL](agents/wasel.md) | واصل | Personal sales follow-up emails | Claude, Shopify discount codes, loyalty connector |
 
-## Shared architecture patterns across the team
+Each page has the agent's brief, its day-to-day tasks, the tools it's built with, and a short, real (sanitized) code excerpt showing the technique — not just a description.
 
-- **Governance first**: every write-capable agent sits behind a Read / Recommend / Execute permission tier, and a supervisor-level kill switch (`/pause` · `/resume` · `/status`) disables every agent's write access instantly.
-- **One audit trail**: every agent action is logged the same way — `timestamp → agent → trigger → data used → decision → action → approval status → result` — so any action is traceable end to end.
-- **No AI self-teaching**: anything an agent "learns" (a support answer, a house lesson, an SEO fix) is stored as *suggested* and only becomes *approved* fact after a human reviews it.
-- **One data layer, not eight**: sales, cost, margin and ad-spend numbers are read from one shared source rather than each agent computing its own, so decisions optimize for profitable revenue rather than top-line numbers.
+## Four rules every agent follows
 
-See each agent's page for its specific tasks, tools, and a short code excerpt.
+1. **Governance first** — every write-capable agent sits behind a Read / Recommend / Execute tier, and one kill switch (`/pause` · `/resume` · `/status`) cuts every agent's write access at once.
+2. **One audit trail** — `timestamp → agent → trigger → data used → decision → action → approval → result`, the same line from every agent, every time.
+3. **No AI self-teaching** — anything an agent learns (a support answer, a house lesson, an SEO fix) is stored as *suggested* and only becomes fact after a human approves it.
+4. **One data layer, not eight** — sales, cost, margin and ad spend come from one shared source, so every agent optimises for profitable revenue, not its own top line.
+
+The kill switch is three lines long:
+
+```js
+// Code node, start of every write-capable workflow
+const state = $('Read Governance State').first().json;
+if (state.systemPaused === 'true') {
+  return [{ json: { skipped: true, reason: 'system paused via /pause' } }];
+}
+```
+
+## This repo
+
+```
+agents/          one Markdown brief per agent (what the site's dossiers are built from)
+src/             the showcase site - Vite + React + Framer Motion, no UI framework
+public/media/    the film (MP4) and its poster
+media/           the GIF at the top of this page
+.github/         GitHub Pages deploy on every push to main
+```
+
+Run it locally:
+
+```bash
+npm install
+npm run dev
+```
+
+The film was produced in [Remotion](https://www.remotion.dev) with an original, procedurally synthesized soundtrack — every cut lands on the beat grid, the same way every agent lands on the audit trail.
+
+## Related
+
+- The companion private repo, `wazir-agent-department`, holds the operational detail: real workflow and table IDs, the governance docs, the ops dashboard.
+- Real agent names, real code patterns, sanitized: no IDs, keys or customer data live here.

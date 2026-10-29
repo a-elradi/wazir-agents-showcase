@@ -1,0 +1,26 @@
+{
+  "name": "wazir-agents-showcase",
+  "private": true,
+  "version": "1.0.0",
+  "description": "WAZIR Agent Department - public showcase site for a 12-agent AI operations team built on n8n",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --port 4173 --strictPort",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "framer-motion": "^14.7.1",
+    "lucide-react": "^1.48.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.1.2",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.5"
+  }
+}
