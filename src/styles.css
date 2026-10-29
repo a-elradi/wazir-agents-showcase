@@ -786,8 +786,8 @@ code {
 .org__svg {
   display: block;
   width: 100%;
-  min-width: 860px;
-  max-width: 1300px;
+  min-width: 980px;
+  max-width: 1360px;
   margin: 0 auto;
 }
 .org__halo {
@@ -940,6 +940,10 @@ code {
   gap: 20px;
   margin-top: 20px;
 }
+/* 13 specialists in 3 columns leaves one card alone on the last row - centre it. */
+.grid > :nth-child(3n + 1):last-child {
+  grid-column: 2;
+}
 .card {
   position: relative;
   display: flex;
@@ -1056,9 +1060,16 @@ code {
   background: var(--maroon-50);
   color: var(--maroon);
 }
+.tag--brand {
+  background: #f1e7f5;
+  color: #5e2b78;
+}
 @media (max-width: 1000px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .grid > :nth-child(3n + 1):last-child {
+    grid-column: auto;
   }
   .lead {
     grid-template-columns: 1fr;

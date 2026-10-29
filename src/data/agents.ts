@@ -1,10 +1,12 @@
 import {
   BrainCircuit,
   Bug,
+  Compass,
   Crown,
   Eye,
   HandCoins,
   MailCheck,
+  Palette,
   Radar,
   Scale,
   SearchCheck,
@@ -19,7 +21,7 @@ export type Agent = {
   ar: string;
   role: string;
   meaning: string;
-  group: "System" | "Customer care" | "Growth" | "Ads" | "Sales" | "Supervisor";
+  group: "System" | "Customer care" | "Growth" | "Ads" | "Sales" | "Brand" | "Supervisor";
   Icon: LucideIcon;
   brief: string;
   tasks: string[];
@@ -379,6 +381,68 @@ for (const journey of due) {
   await logToTeamSheet({ customer: journey.customerId, manager, code });
 }`,
   },
+  {
+    key: "DALEEL",
+    ar: "دليل",
+    role: "Search & AI-engine visibility",
+    meaning: "the guide, points search and AI engines to the store",
+    group: "Growth",
+    Icon: Compass,
+    brief:
+      "Owns how the stores get found — by Google, Bing and the AI answer engines. Fixes what it can on its own, logs every change as before / after / why, and stays out of lanes that already have an owner.",
+    tasks: [
+      "Daily search pass over every new product: titles, descriptions, the real brand in the brand field, structured data",
+      "Reads Search Console and Bing data for quick wins: pages that almost rank, pages losing clicks, 404s to redirect",
+      "Technical layer across the 3 storefronts: hreflang between sibling stores, sitemaps, schema, same-day URL submission",
+      "Weekly AI-visibility test: asks the major answer engines about the store's categories in English and Arabic and tracks who gets named",
+      "Publishes buying guides from real customer questions, max two a week, facts checked against store policy",
+      "Logs every change as before / after / why; skips products KASHEF already fixed; never touches ads",
+    ],
+    tools: ["AI model", "Search Console API", "Bing URL Submission API", "Shopify Admin GraphQL × 3", "Team log sheet"],
+    codeTitle: "Changes on its own, never silently",
+    code: `// DALEEL may fix a product by itself - but every fix leaves a paper trail.
+const product = await getProduct(storeId, productId);
+if (await alreadyFixedBy('KASHEF', product.id)) return { skipped: true, reason: 'KASHEF owns this one' };
+
+const fix = await proposeSearchFix(product); // title, description, brand, schema
+await applySearchFix(storeId, product.id, fix);
+
+await logToTeamSheet('daleel', {
+  type: 'product SEO',
+  before: pick(product, ['seoTitle', 'seoDescription', 'vendor']),
+  after: fix,
+  why: fix.rationale, // one sentence a human can audit later
+});`,
+  },
+  {
+    key: "RASSAM",
+    ar: "رسام",
+    role: "Brand design & social content",
+    meaning: "the painter, keeps every post on brand",
+    group: "Brand",
+    Icon: Palette,
+    brief:
+      "The in-house designer. Learned the brand's own playbook from years of real campaign files and designs posts, stories, carousels and reels in that pattern, with the real product kept pixel-perfect. Nothing is published until the owner approves it.",
+    tasks: [
+      "Designs feed posts, stories, carousels and short reels for each storefront's Instagram account, in the house style",
+      "Builds from the brand's own hi-res product photos: AI makes the scene, never redraws the product",
+      "Follows a written brand playbook: colours, type, logo placement, rows of three, one colour story per row",
+      "Reads reach and saves on every published post to learn what the audience responds to",
+      "Every draft waits for the owner's approval; only approved designs reach the publishing step",
+      "Reels are cut to an in-house royalty-free music library, so there are no licensing surprises",
+    ],
+    tools: ["AI image & video models", "Background removal", "Brand design library", "Instagram publishing API", "Video renderer", "Royalty-free music library"],
+    codeTitle: "AI makes the scene, never the product",
+    code: `// The product is the one thing AI may not touch.
+const cutout = await removeBackground(product.heroPhoto);            // real pixels, kept as-is
+const scene = await generateScene(brief.concept, { aspect: '4:5' }); // AI builds the stage
+const composed = placeProduct(scene, cutout, { shadow: 'contact', relight: 'brightness-only' });
+
+const post = brandFrame(composed, { logo: brand.logo, caption: brief.caption, font: PLAYBOOK.font });
+
+await insertRow(designQueue, { account: brief.account, post, status: 'awaiting_approval' });
+// Only 'approved' rows ever reach the publishing step.`,
+  },
 ];
 
 export const ALL = [WAZIR, ...TEAM];
@@ -396,8 +460,10 @@ export const LOG = [
   "06:00:41  MIZAN    312 chats reviewed · AI score 4.6 / 5",
   "06:01:40  RAED     150 shops + 36 press sources scanned",
   "06:02:11  KASHEF   drafting SEO title · Rhode Bubble Bag",
+  "06:02:29  DALEEL   14 new products · search-ready · logged",
   "06:02:48  WASEL    38 follow-up emails · signed by account managers",
   "06:03:05  TAJER    14-day pulse · VIP customers updated",
+  "06:03:52  RASSAM   3 post drafts ready · awaiting approval",
   "06:04:30  RASID    ads advisor report ready",
   "06:05:12  WAZIR    daily brief ready",
 ];

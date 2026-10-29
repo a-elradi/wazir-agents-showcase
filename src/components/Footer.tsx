@@ -35,7 +35,7 @@ export function Footer() {
             Every agent's brief
           </a>
           <a href={FILM_MP4} target="_blank" rel="noreferrer">
-            The film · MP4 · 54 s
+            The film · MP4 · 58 s
           </a>
         </div>
       </div>

@@ -4,8 +4,8 @@ import { useState } from "react";
 import { TEAM, WAZIR, type Agent } from "../data/agents";
 import { EASE, Eyebrow, FadeUp, Words } from "./ui";
 
-const W = 1200;
-const TOP = { x: 600, y: 96 };
+const W = 1360;
+const TOP = { x: W / 2, y: 96 };
 const NODE_Y = 400;
 const R = 38;
 const xs = TEAM.map((_, i) => 80 + (i * (W - 160)) / (TEAM.length - 1));
@@ -20,17 +20,17 @@ export function OrgChart() {
     <section className="org section section--white" id="org">
       <div className="wrap">
         <Eyebrow>The org chart</Eyebrow>
-        <Words text="12 AI agents. One team." hl={["One", "team."]} className="h2" />
+        <Words text="14 AI agents. One team." hl={["One", "team."]} className="h2" />
         <FadeUp delay={0.2}>
           <p className="lede">
-            WAZIR is the only agent the owner talks to. It routes, merges and reports; the eleven specialists each own one lane and never
+            WAZIR is the only agent the owner talks to. It routes, merges and reports; the thirteen specialists each own one lane and never
             step outside it. Hover a node, click to open its dossier.
           </p>
         </FadeUp>
       </div>
 
       <FadeUp className="org__scroller" amount={0.2}>
-        <svg className="org__svg" viewBox={`0 0 ${W} 520`} role="img" aria-label="WAZIR above eleven specialist agents, connected by lines">
+        <svg className="org__svg" viewBox={`0 0 ${W} 520`} role="img" aria-label="WAZIR above thirteen specialist agents, connected by lines">
           <defs>
             <linearGradient id="orgLine" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stopColor="#800000" />

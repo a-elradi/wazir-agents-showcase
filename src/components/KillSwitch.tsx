@@ -20,7 +20,7 @@ export function KillSwitch() {
       if (typing === "/pause") {
         setPaused(true);
         setStatus(false);
-        setLog("Paused by the owner · 12 agents stopped · logged by NASEEJ");
+        setLog(`Paused by the owner · ${ALL.length} agents stopped · logged by NASEEJ`);
       } else if (typing === "/resume") {
         setPaused(false);
         setStatus(false);

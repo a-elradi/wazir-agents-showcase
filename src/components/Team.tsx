@@ -123,7 +123,7 @@ export function Team() {
     <section className="team section section--paper" id="team">
       <div className="wrap">
         <Eyebrow>The team</Eyebrow>
-        <Words text="Eleven specialists. Each owns one lane." hl={["one", "lane."]} className="h2" />
+        <Words text="Thirteen specialists. Each owns one lane." hl={["one", "lane."]} className="h2" />
         <FadeUp delay={0.2}>
           <p className="lede">
             Every agent has a real Arabic name that says what it does. Open a dossier for the day-to-day tasks, the tools it's built with,

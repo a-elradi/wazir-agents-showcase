@@ -5,14 +5,14 @@
 <h1 align="center">WAZIR Agent Department</h1>
 
 <p align="center">
-  <strong>One supervisor. Eleven specialists. Zero idle hands.</strong><br />
-  A 12-agent AI operations team running a three-store fashion retailer day and night.
+  <strong>One supervisor. Thirteen specialists. Zero idle hands.</strong><br />
+  A 14-agent AI operations team running a three-store fashion retailer day and night.
 </p>
 
 <p align="center">
   <a href="https://a-elradi.github.io/wazir-agents-showcase/"><img alt="Live site" src="https://img.shields.io/badge/live_site-a--elradi.github.io-800000?style=for-the-badge" /></a>
-  <a href="public/media/wazir-showcase.mp4"><img alt="The film" src="https://img.shields.io/badge/the_film-54_s_·_1080p-111111?style=for-the-badge" /></a>
-  <img alt="Agents" src="https://img.shields.io/badge/agents-12-B8963E?style=for-the-badge" />
+  <a href="public/media/wazir-showcase.mp4"><img alt="The film" src="https://img.shields.io/badge/the_film-58_s_·_1080p-111111?style=for-the-badge" /></a>
+  <img alt="Agents" src="https://img.shields.io/badge/agents-14-B8963E?style=for-the-badge" />
   <img alt="Automations" src="https://img.shields.io/badge/live_automations-81-800000?style=for-the-badge" />
 </p>
 
@@ -24,9 +24,9 @@
 
 ## What WAZIR is
 
-WAZIR (وزير, "the minister") is the only agent the owner talks to. It routes a request to whichever specialist it needs, merges their findings, reports back, and holds the team's kill switch. The eleven specialists each own one lane — product scouting, SEO, technical and UX audits, ad management, refunds, support memory, AI-quality review, sales pulse, personal sales follow-up — and never step outside it.
+WAZIR (وزير, "the minister") is the only agent the owner talks to. It routes a request to whichever specialist it needs, merges their findings, reports back, and holds the team's kill switch. The thirteen specialists each own one lane — product scouting, SEO, search and AI-engine visibility, technical and UX audits, ad management, refunds, support memory, AI-quality review, sales pulse, personal sales follow-up, brand design and social content — and never step outside it.
 
-Everything runs on WAZIR's own orchestration engine, thinks with a frontier AI model, and reads and writes through the store (three storefronts), WhatsApp, Instagram, Telegram, email, Google Ads, Meta Ads and Google Sheets — behind one governance table and one audit trail.
+Everything runs on WAZIR's own orchestration engine, thinks with a frontier AI model, and reads and writes through the store (three storefronts), WhatsApp, Instagram, Telegram, email, Google Ads, Meta Ads, Google Sheets and Search Console — behind one governance table and one audit trail.
 
 ## The team
 
@@ -44,6 +44,8 @@ Everything runs on WAZIR's own orchestration engine, thinks with a frontier AI m
 | 09 | [TAJER](agents/tajer.md) | تاجر | Sales pulse / profitability | Store analytics API |
 | 10 | [RASID](agents/rasid.md) | راصد | Google & Meta Ads | Google Ads API, Meta Ads API, AI model |
 | 11 | [WASEL](agents/wasel.md) | واصل | Personal sales follow-up emails | AI model, store discount codes, loyalty connector |
+| 12 | [DALEEL](agents/daleel.md) | دليل | Search & AI-engine visibility | AI model, Search Console, Bing API, store API × 3 |
+| 13 | [RASSAM](agents/rassam.md) | رسام | Brand design & social content | AI image & video models, design library, Instagram publishing |
 
 Each page has the agent's brief, its day-to-day tasks, what it connects to, and a short, sanitized excerpt showing the pattern that keeps it safe — not just a description.
 
