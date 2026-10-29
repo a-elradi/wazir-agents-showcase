@@ -9,23 +9,26 @@
 - Confirms the kill switch state is consistent across the fleet.
 - Reports a daily system-health summary to the ops channel and logs it.
 
-## Tools & tech
+## Connects to
 
 Shopify Admin GraphQL API, Meta Graph API, Microsoft Graph API, a messaging-platform Business API, a shared Telegram ops channel, a Health Log data table.
 
 ## Excerpt — paging a big read instead of loading it all
 
-An early version of this agent tried to load a full product catalog into one in-memory step and took the whole automation platform down with it. The fix is now a standing rule for the whole team: never load more than a bounded page at a time.
+An early version of this agent tried to load a full product catalog into one in-memory step and took the whole platform down with it. The fix is now a standing rule for the whole team: never load more than a bounded page at a time.
 
 ```js
-// Code node — WRONG: loads everything, can exceed node memory
+// WRONG: loads everything, can exceed the step's memory
 // const all = await fetchEntireCatalog();
 
-// Right: HTTP Request node paginates, Code node only reshapes one page
+// Right: one bounded page per step, the cursor carried forward
 const PAGE_SIZE = 250;
-let cursor = $json.cursor || null;
-const page = await fetchCatalogPage({ first: PAGE_SIZE, after: cursor });
-return [{ json: { items: page.items, nextCursor: page.pageInfo.endCursor, hasMore: page.pageInfo.hasNextPage } }];
+const page = await fetchCatalogPage({ first: PAGE_SIZE, after: input.cursor ?? null });
+return {
+  items: page.items,
+  nextCursor: page.pageInfo.endCursor,
+  hasMore: page.pageInfo.hasNextPage,
+};
 ```
 
-Any loop that might run long also respects the automation platform's own execution-time ceiling for a single step, batching work across HTTP calls rather than one long-running script.
+Any loop that might run long also respects the engine's execution-time ceiling for a single step, batching work across HTTP calls rather than one long-running script.

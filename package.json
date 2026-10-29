@@ -2,7 +2,7 @@
   "name": "wazir-agents-showcase",
   "private": true,
   "version": "1.0.0",
-  "description": "WAZIR Agent Department - public showcase site for a 12-agent AI operations team built on n8n",
+  "description": "WAZIR Agent Department - public showcase site for a 12-agent AI operations team",
   "type": "module",
   "scripts": {
     "dev": "vite",

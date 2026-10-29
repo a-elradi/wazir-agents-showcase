@@ -5,14 +5,14 @@
 ## Day-to-day tasks
 
 - Scans the entire catalog for missing or weak SEO titles, meta descriptions and image alt text.
-- Drafts a replacement for each flagged product with an LLM, showing a clear before/after.
+- Drafts a replacement for each flagged product with the model, showing a clear before/after.
 - Applies an approved fix straight to the live product on request.
 - Can run a background "fix everything" pass that works through the whole flagged list in small batches, calling itself until the list is empty — with start/stop/resume control and live progress.
 - Logs every fix, automatic or manual, to a shared sheet the team can audit.
 
-## Tools & tech
+## Connects to
 
-An LLM for SEO copywriting, Shopify Admin GraphQL API (product metafields), a progress-tracking data table for the long-running batch runner, a dashboard with Start/Stop/Resume controls.
+An AI model for SEO copywriting, Shopify Admin GraphQL API (product metafields), a progress-tracking data table for the long-running batch runner, a dashboard with Start/Stop/Resume controls.
 
 ## Excerpt — a stoppable background batch runner
 
@@ -21,7 +21,7 @@ An LLM for SEO copywriting, Shopify Admin GraphQL API (product metafields), a pr
 // between rounds, and calls itself until the queue is empty
 const ROUND_SIZE = 15;
 const progress = await readProgressRow(runId);
-if (progress.stopRequested) return [{ json: { stopped: true } }];
+if (progress.stopRequested) return { stopped: true };
 
 const batch = await getNextUnfixed(storeId, ROUND_SIZE);
 for (const product of batch) await fixOneProduct(product);

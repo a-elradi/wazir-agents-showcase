@@ -44,12 +44,12 @@ export const WAZIR: Agent = {
     "Holds a hesitant customer's items for 24 h and cleans up expired holds",
     "Reports real AI spend from the model provider's own cost API",
   ],
-  tools: ["n8n", "Telegram Bot API", "Governance data table", "Shopify Admin GraphQL × 3", "Anthropic Admin API", "MCP-driven dashboard"],
-  codeTitle: "The kill-switch read, at the top of every write-capable workflow",
-  code: `// Code node, start of every write-capable workflow
-const state = $('Read Governance State').first().json;
-if (state.systemPaused === 'true') {
-  return [{ json: { skipped: true, reason: 'system paused via /pause' } }];
+  tools: ["Orchestration engine", "Telegram Bot API", "Governance data table", "Shopify Admin GraphQL × 3", "Model-provider cost API", "Management dashboard"],
+  codeTitle: "The kill-switch read, at the top of every write-capable automation",
+  code: `// First step of every write-capable automation
+const state = await governance.state();
+if (state.systemPaused) {
+  return { skipped: true, reason: 'system paused via /pause' };
 }
 // /resume needs a second, explicit confirmation before writes come back.`,
 };
@@ -69,20 +69,19 @@ export const TEAM: Agent[] = [
       "Confirms the kill-switch state is consistent across the fleet",
       "Posts a daily system-health summary and logs it",
     ],
-    tools: ["Shopify Admin GraphQL", "Meta Graph API", "Microsoft Graph API", "WhatsApp Business API", "Telegram", "Health Log table"],
+    tools: ["Shopify Admin GraphQL", "Meta Graph API", "Microsoft Graph API", "WhatsApp Business API", "Telegram", "Health-log table"],
     codeTitle: "Paging a big read instead of loading it all",
-    code: `// WRONG: loads everything, can exceed node memory
+    code: `// WRONG: loads everything, can exceed the step's memory
 // const all = await fetchEntireCatalog();
 
-// Right: HTTP Request node paginates, Code node only reshapes one page
+// Right: one bounded page per step, the cursor carried forward
 const PAGE_SIZE = 250;
-const cursor = $json.cursor || null;
-const page = await fetchCatalogPage({ first: PAGE_SIZE, after: cursor });
-return [{ json: {
+const page = await fetchCatalogPage({ first: PAGE_SIZE, after: input.cursor ?? null });
+return {
   items: page.items,
   nextCursor: page.pageInfo.endCursor,
   hasMore: page.pageInfo.hasNextPage,
-} }];`,
+};`,
   },
   {
     key: "HAFEZ",
@@ -93,21 +92,21 @@ return [{ json: {
     Icon: BrainCircuit,
     brief: "Remembers every answer the team has ever given a customer. Never self-teaching: nothing becomes fact until a human approves it.",
     tasks: [
-      "Watches every human reply to a customer and asks an LLM: reusable policy, or one-off?",
+      "Watches every human reply to a customer and asks the model: reusable policy, or one-off?",
       "Deduplicates against the knowledge base before proposing a new entry",
       "Stores candidates as Suggested — only Approved entries reach a bot's prompt",
       "Nightly digest of questions the bots could not answer; the team replies with the answer",
     ],
-    tools: ["Claude", "Knowledge-base data table", "Telegram", "[TEAM ANSWERS] prompt block"],
+    tools: ["AI model", "Knowledge-base data table", "Telegram", "[TEAM ANSWERS] prompt block"],
     codeTitle: "Classify, dedupe, queue — never auto-publish",
-    code: `const verdict = await askLLM(\`Is this a reusable store policy answer, or a one-off?
+    code: `const verdict = await askModel(\`Is this a reusable store policy answer, or a one-off?
 Customer asked: \${customerMessage}
 Human replied: \${humanReply}\`);
 
-if (!verdict.reusable) return [{ json: { logged: true, reusable: false } }];
+if (!verdict.reusable) return { logged: true, reusable: false };
 
 const existing = await findSimilarEntry(verdict.question, knowledgeBaseTable);
-if (existing) return [{ json: { deduped: true, matchedId: existing.id } }];
+if (existing) return { deduped: true, matchedId: existing.id };
 
 await insertRow(knowledgeBaseTable, {
   question: verdict.question,
@@ -133,7 +132,7 @@ await insertRow(knowledgeBaseTable, {
     code: `// Calling this twice for the same order/reason is a no-op.
 const idempotencyKey = \`\${orderId}:\${reasonCode}\`;
 const existing = await findByKey(refundQueueTable, idempotencyKey);
-if (existing) return [{ json: { ok: true, alreadyQueued: true, id: existing.id } }];
+if (existing) return { ok: true, alreadyQueued: true, id: existing.id };
 
 const row = await insertRow(refundQueueTable, {
   idempotencyKey,
@@ -143,7 +142,7 @@ const row = await insertRow(refundQueueTable, {
   flaggedAt: new Date().toISOString(),
 });
 await alertOpsChannel('Refund request queued - decide within the SLA window');
-return [{ json: { ok: true, id: row.id } }];`,
+return { ok: true, id: row.id };`,
   },
   {
     key: "MIZAN",
@@ -158,7 +157,7 @@ return [{ json: { ok: true, id: row.id } }];`,
       "Ties every customer rating back to the conversation that earned it",
       "Proposes weekly house lessons — a human approves, edits, rejects or retires each one",
     ],
-    tools: ["Claude", "Ratings table", "House-lessons table (approval state machine)", "Dashboard review UI"],
+    tools: ["AI model", "Ratings table", "House-lessons table (approval state machine)", "Dashboard review UI"],
     codeTitle: "Lessons are proposed, never self-installed",
     code: `// Weekly proposal run - writes nothing a bot can read yet
 for (const c of await findRecurringIssues(lastWeeksConversations)) {
@@ -190,19 +189,19 @@ const promptBlock = lessons.length
       "Bulk-imports a whole category page, batching itself in threes overnight",
       "Daily pass over its own drafts: safe fixes applied, the rest listed, nothing deleted",
     ],
-    tools: ["Claude", "Free web reader (no paid credits)", "Shopify productSet", "Headless-browser relay", "Product-team view with login"],
+    tools: ["AI model", "Free web reader (no paid credits)", "Shopify productSet", "Headless-browser relay", "Product-team view with login"],
     codeTitle: "Self-batching to survive a big import",
     code: `// "Bulk Import From Page" calls itself in small groups
 const BATCH_SIZE = 3;
-const thisBatch = $json.productUrls.slice(0, BATCH_SIZE);
-const remaining = $json.productUrls.slice(BATCH_SIZE);
+const thisBatch = input.productUrls.slice(0, BATCH_SIZE);
+const remaining = input.productUrls.slice(BATCH_SIZE);
 
 for (const url of thisBatch) await importOneProduct(url);
 
 if (remaining.length) {
-  await callSelf({ productUrls: remaining }); // same workflow, next batch
+  await callSelf({ productUrls: remaining }); // same automation, next batch
 }
-return [{ json: { importedThisRun: thisBatch.length, remaining: remaining.length } }];`,
+return { importedThisRun: thisBatch.length, remaining: remaining.length };`,
   },
   {
     key: "KASHEF",
@@ -218,11 +217,11 @@ return [{ json: { importedThisRun: thisBatch.length, remaining: remaining.length
       "Fix-all background runner works the backlog in small rounds with Stop / Resume",
       "Every fix logged to a sheet the team can audit",
     ],
-    tools: ["Claude", "Shopify Admin GraphQL (metafields)", "Progress data table", "Dashboard Start / Stop / Resume"],
+    tools: ["AI model", "Shopify Admin GraphQL (metafields)", "Progress data table", "Dashboard Start / Stop / Resume"],
     codeTitle: "A stoppable background batch runner",
     code: `const ROUND_SIZE = 15;
 const progress = await readProgressRow(runId);
-if (progress.stopRequested) return [{ json: { stopped: true } }];
+if (progress.stopRequested) return { stopped: true };
 
 const batch = await getNextUnfixed(storeId, ROUND_SIZE);
 for (const product of batch) await fixOneProduct(product);
@@ -263,7 +262,7 @@ while (queue.length && seen.size < MAX_LINKS) {
     if (!seen.has(link)) { seen.add(link); queue.push(link); }
   }
 }
-return [{ json: { checked: seen.size, broken } }];`,
+return { checked: seen.size, broken };`,
   },
   {
     key: "DHAWWAQ",
@@ -278,7 +277,7 @@ return [{ json: { checked: seen.size, broken } }];`,
       "Runs a separate UX review of the storefront experience",
       "Report-only — findings go to the team",
     ],
-    tools: ["Shopify Admin GraphQL × 3", "Claude", "Telegram"],
+    tools: ["Shopify Admin GraphQL × 3", "AI model", "Telegram"],
     codeTitle: "Diffing sibling stores, not just checking one",
     code: `const stores = ['kw', 'bh', 'us'];
 const snapshots = await Promise.all(stores.map(fetchStorefrontSnapshot));
@@ -291,7 +290,7 @@ for (const field of ['products', 'collections', 'policies', 'homepage']) {
     if (diff.length) mismatches.push({ store: stores[i], field, diff });
   }
 }
-return [{ json: { mismatches } }]; // report only`,
+return { mismatches }; // report only`,
   },
   {
     key: "TAJER",
@@ -333,7 +332,7 @@ if (authorityFor(proposedAction) === 'needs_human') {
       "On-demand advisor report, cross-checked line by line against real storefront orders",
       "A live chat the team can ask ad questions of, for any date range",
     ],
-    tools: ["Google Ads API", "Meta Ads API", "Shopify Admin GraphQL", "Claude"],
+    tools: ["Google Ads API", "Meta Ads API", "Shopify Admin GraphQL", "AI model"],
     codeTitle: "Staged autonomy instead of day-one trust",
     code: `function stageFor(agent) {
   if (agent.daysLive < 30) return 'read_only';          // recommends only
@@ -365,7 +364,7 @@ if (stage === 'read_only') {
       "Writes each email in the account manager's voice with a one-time personal code",
       "Reports every couple of hours: sent, waiting, codes issued, orders attributed",
     ],
-    tools: ["Claude", "Shopify discount codes", "Loyalty connector", "Journeys data table", "Team results sheet"],
+    tools: ["AI model", "Shopify discount codes", "Loyalty connector", "Journeys data table", "Team results sheet"],
     codeTitle: "One journey per reason, gated by due time",
     code: `const due = await queryRows(journeysTable, { status: 'pending', dueAt: { lte: now() } });
 for (const journey of due) {
@@ -385,11 +384,12 @@ for (const journey of due) {
 export const ALL = [WAZIR, ...TEAM];
 
 export const REPO = "https://github.com/a-elradi/wazir-agents-showcase";
+export const CONTACT = "https://github.com/a-elradi";
 export const agentDoc = (key: string) => `${REPO}/blob/main/agents/${key.toLowerCase()}.md`;
 
 // The cold-open log from the film, reused by the hero terminal and the ticker.
 export const LOG = [
-  "06:00:02  NASEEJ   health check · 81 workflows ............. OK",
+  "06:00:02  NASEEJ   health check · 81 automations ........... OK",
   "06:00:05  NASEEJ   AI health check · backup AI ready ....... OK",
   "06:00:09  FAHES    kw.glam-moda.com · links & pages ......... 200",
   "06:00:30  AMEEN    2 refund requests · damaged items",

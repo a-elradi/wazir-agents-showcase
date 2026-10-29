@@ -8,9 +8,9 @@ A weekly watchdog making sure sibling storefronts (different country/currency, s
 - Runs a separate UX-focused review of the storefront experience itself.
 - Report-only — findings go to the team for manual action.
 
-## Tools & tech
+## Connects to
 
-Shopify Admin GraphQL API across every storefront, an LLM for content comparison, a reporting channel.
+Shopify Admin GraphQL API across every storefront, an AI model for content comparison, a reporting channel.
 
 ## Excerpt — diffing sibling stores, not just checking one
 
@@ -26,5 +26,5 @@ for (const field of ['products', 'collections', 'policies', 'homepage']) {
     if (diff.length) mismatches.push({ store: stores[i], field, diff });
   }
 }
-return [{ json: { mismatches } }]; // report only — nothing here writes anything
+return { mismatches }; // report only — nothing here writes anything
 ```

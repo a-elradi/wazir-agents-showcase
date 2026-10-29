@@ -8,9 +8,9 @@ The nightly reviewer of the support bots' own conversations, and the engine behi
 - Ties customer-given ratings back to the specific conversation that earned them.
 - Proposes new "house lessons" drawn from real conversations every week — a human approves, edits, rejects or retires each one before a bot ever sees it.
 
-## Tools & tech
+## Connects to
 
-An LLM for conversation review, a ratings data table, a house-lessons data table with an approval state machine, a dashboard review UI.
+An AI model for conversation review, a ratings data table, a house-lessons data table with an approval state machine, a dashboard review UI.
 
 ## Excerpt — lessons are proposed, never self-installed
 

@@ -51,7 +51,7 @@ function TerminalLog() {
 const STATS = [
   ["12", "AI agents"],
   ["3", "storefronts"],
-  ["81", "live workflows"],
+  ["81", "live automations"],
   ["1", "kill switch"],
 ];
 
@@ -80,7 +80,7 @@ export function Hero() {
       <div className="wrap hero__grid">
         <div className="hero__copy">
           <motion.div initial={SHOT ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2, ease: EASE }}>
-            <Eyebrow className="eyebrow--light">WAZIR · AI operations team · built on n8n</Eyebrow>
+            <Eyebrow className="eyebrow--light">WAZIR · AI operations team · 3 stores · 24/7</Eyebrow>
           </motion.div>
           <Words as="h1" className="hero__h1" text="While you sleep, your AI team is already working." hl={["AI", "team"]} delay={0.35} once />
           <motion.p className="hero__lede" initial={SHOT ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 1.1, ease: EASE }}>
@@ -121,7 +121,7 @@ export function Hero() {
             </button>
             <div className="player__badge">The WAZIR film · 1080p</div>
           </div>
-          <p className="hero__player-note">Every cut in the film lands on the beat: it was produced in Remotion, the same way the team was built — in code.</p>
+          <p className="hero__player-note">Every cut in the film lands on the beat: it was produced entirely in code — the same way the team was built.</p>
         </motion.div>
       </div>
 

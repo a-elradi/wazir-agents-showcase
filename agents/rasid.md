@@ -5,13 +5,13 @@
 ## Day-to-day tasks
 
 - Ongoing performance monitoring across ad platforms.
-- An on-demand, LLM-written advisor report, cross-checked line by line against real storefront order data rather than trusting the ad platform's own attribution.
+- An on-demand, model-written advisor report, cross-checked line by line against real storefront order data rather than trusting the ad platform's own attribution.
 - A live chat interface the team can ask ad questions of, for any date range, with its own query path for custom ranges.
 - Historical pulls to seed a full-account performance review.
 
-## Tools & tech
+## Connects to
 
-Ad-platform reporting APIs (search + social), Shopify Admin GraphQL API for cross-checking real conversions, an LLM for report writing and the chat interface.
+Ad-platform reporting APIs (search + social), Shopify Admin GraphQL API for cross-checking real conversions, an AI model for report writing and the chat interface.
 
 ## Excerpt — staged autonomy instead of day-one trust
 

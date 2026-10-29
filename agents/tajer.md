@@ -8,7 +8,7 @@
 - Feeds the same numbers (selling price, cost of goods, payment fees, shipping cost, discount, ad cost, returns) into one shared view, rather than letting each revenue-facing agent compute its own and risk disagreeing.
 - Carries a bounded promotion authority: a cart reminder or restock notice is automatic; a 5-10% discount needs to stay inside pre-approved rules; anything bigger, or any price change, needs a human.
 
-## Tools & tech
+## Connects to
 
 Shopify Analytics / Admin GraphQL API, a shared profitability data model, a reporting channel for the team.
 

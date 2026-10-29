@@ -10,19 +10,19 @@ The orchestrator. Routes a request to whichever specialist(s) it needs, merges t
 - Holds a customer's chosen items for 24h (private checkout) when they hesitate, and cleans up expired holds.
 - Reports real AI spend from the model provider's own cost API, on demand.
 
-## Tools & tech
+## Connects to
 
-n8n (workflow orchestration), Telegram Bot API (ops commands), a shared governance data table (system state / audit log / agent registry), Shopify Admin GraphQL API across multiple storefronts, Anthropic Admin API (cost reporting), a Claude-built management dashboard talking to n8n through MCP-style tool calls rather than hardcoded webhooks.
+WAZIR's orchestration engine (schedules, triggers, retries), Telegram Bot API (ops commands), a shared governance data table (system state / audit log / agent registry), Shopify Admin GraphQL API across multiple storefronts, the model provider's cost API (spend reporting), a management dashboard that talks to the engine through typed tool calls rather than hardcoded webhooks.
 
 ## Excerpt — the kill switch read
 
 Every write-capable agent checks the same governance table before doing anything, so one row flip pauses the whole team:
 
 ```js
-// Code node, start of every write-capable workflow
-const state = $('Read Governance State').first().json;
-if (state.systemPaused === 'true') {
-  return [{ json: { skipped: true, reason: 'system paused via /pause' } }];
+// First step of every write-capable automation
+const state = await governance.state();
+if (state.systemPaused) {
+  return { skipped: true, reason: 'system paused via /pause' };
 }
 ```
 

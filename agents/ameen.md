@@ -8,7 +8,7 @@ The only escalation path the support bots are allowed to use at all — and only
 - Logs the request to a queue a human reviews, idempotently — the same request can't be filed twice.
 - Carries out whatever decision the human makes: approve, reject, or a manual adjustment.
 
-## Tools & tech
+## Connects to
 
 A shared sheet/queue for refund requests, Shopify Admin API for issuing the actual refund, an urgent-alert channel with a decision-window expectation.
 
@@ -19,7 +19,7 @@ A shared sheet/queue for refund requests, Shopify Admin API for issuing the actu
 // order/reason is a no-op, not a duplicate refund request.
 const idempotencyKey = `${orderId}:${reasonCode}`;
 const existing = await findByKey(refundQueueTable, idempotencyKey);
-if (existing) return [{ json: { ok: true, alreadyQueued: true, id: existing.id } }];
+if (existing) return { ok: true, alreadyQueued: true, id: existing.id };
 
 const row = await insertRow(refundQueueTable, {
   idempotencyKey,
@@ -29,5 +29,5 @@ const row = await insertRow(refundQueueTable, {
   flaggedAt: new Date().toISOString(),
 });
 await alertOpsChannel(`Refund request queued — decide within the SLA window`);
-return [{ json: { ok: true, id: row.id } }];
+return { ok: true, id: row.id };
 ```

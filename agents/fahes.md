@@ -9,7 +9,7 @@ A daily outside-in health check of the storefront itself — not the business da
 - Confirms analytics/tracking scripts are actually present and firing (pixel, analytics tag manager, etc).
 - Report-only — it never touches anything itself; findings go to the team.
 
-## Tools & tech
+## Connects to
 
 A plain HTTP crawler, a link-graph check, a free page-reader for anything that needs rendered content, a reporting channel.
 
@@ -30,5 +30,5 @@ while (queue.length && seen.size < MAX_LINKS) {
     if (!seen.has(link)) { seen.add(link); queue.push(link); }
   }
 }
-return [{ json: { checked: seen.size, broken } }];
+return { checked: seen.size, broken };
 ```

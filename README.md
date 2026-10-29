@@ -6,46 +6,46 @@
 
 <p align="center">
   <strong>One supervisor. Eleven specialists. Zero idle hands.</strong><br />
-  A 12-agent AI operations team built on <a href="https://n8n.io">n8n</a>, running a three-store fashion retailer day and night.
+  A 12-agent AI operations team running a three-store fashion retailer day and night.
 </p>
 
 <p align="center">
   <a href="https://a-elradi.github.io/wazir-agents-showcase/"><img alt="Live site" src="https://img.shields.io/badge/live_site-a--elradi.github.io-800000?style=for-the-badge" /></a>
   <a href="public/media/wazir-showcase.mp4"><img alt="The film" src="https://img.shields.io/badge/the_film-54_s_·_1080p-111111?style=for-the-badge" /></a>
   <img alt="Agents" src="https://img.shields.io/badge/agents-12-B8963E?style=for-the-badge" />
-  <img alt="Workflows" src="https://img.shields.io/badge/live_workflows-81-800000?style=for-the-badge" />
+  <img alt="Automations" src="https://img.shields.io/badge/live_automations-81-800000?style=for-the-badge" />
 </p>
 
 ---
 
 > Deployed for one of the biggest online shopping companies in the Middle East: **GLAM MODA** — Kuwait · Bahrain · USA.
 
-**[Open the showcase site →](https://a-elradi.github.io/wazir-agents-showcase/)** — the film, an interactive org chart, a dossier for every agent (tasks, tools, the real code pattern), and a working model of the kill switch you can press yourself.
+**[Open the showcase site →](https://a-elradi.github.io/wazir-agents-showcase/)** — the film, an interactive org chart, a dossier for every agent (tasks, integrations, the pattern that keeps it safe), and a working model of the kill switch you can press yourself.
 
 ## What WAZIR is
 
 WAZIR (وزير, "the minister") is the only agent the owner talks to. It routes a request to whichever specialist it needs, merges their findings, reports back, and holds the team's kill switch. The eleven specialists each own one lane — product scouting, SEO, technical and UX audits, ad management, refunds, support memory, AI-quality review, sales pulse, personal sales follow-up — and never step outside it.
 
-Everything runs on n8n, thinks with Claude, and reads and writes through Shopify (three stores), Telegram, WhatsApp, Instagram, Outlook, Google Ads, Meta Ads and Google Sheets — behind one governance table and one audit trail.
+Everything runs on WAZIR's own orchestration engine, thinks with a frontier AI model, and reads and writes through the store (three storefronts), WhatsApp, Instagram, Telegram, email, Google Ads, Meta Ads and Google Sheets — behind one governance table and one audit trail.
 
 ## The team
 
-| # | Agent | Arabic | Role | Core tools |
+| # | Agent | Arabic | Role | Connects to |
 |---|---|---|---|---|
-| — | [WAZIR](agents/wazir.md) | وزير | Supervisor / CEO interface | n8n, Telegram, governance data table, Shopify Admin GraphQL × 3 |
-| 01 | [NASEEJ](agents/naseej.md) | نسيج | System health & audit trail | Shopify API, Meta / Microsoft Graph, Telegram |
-| 02 | [HAFEZ](agents/hafez.md) | حافظ | Support knowledge base | Claude, n8n Data Table, Telegram |
-| 03 | [AMEEN](agents/ameen.md) | أمين | Refunds | Google Sheets queue, idempotent webhook, Shopify |
-| 04 | [MIZAN](agents/mizan.md) | ميزان | AI quality & ratings | Claude, ratings table, approval workflow |
-| 05 | [RAED](agents/raed.md) | رائد | Product scouting & catalog import | Claude, Shopify `productSet`, headless browser |
-| 06 | [KASHEF](agents/kashef.md) | كاشف | SEO & content | Claude, Shopify Admin API, self-calling batch runner |
+| — | [WAZIR](agents/wazir.md) | وزير | Supervisor / CEO interface | Telegram, governance table, store API × 3 |
+| 01 | [NASEEJ](agents/naseej.md) | نسيج | System health & audit trail | Store API, Meta / Microsoft Graph, Telegram |
+| 02 | [HAFEZ](agents/hafez.md) | حافظ | Support knowledge base | AI model, knowledge-base table, Telegram |
+| 03 | [AMEEN](agents/ameen.md) | أمين | Refunds | Sheets queue, idempotent webhook, store API |
+| 04 | [MIZAN](agents/mizan.md) | ميزان | AI quality & ratings | AI model, ratings table, approval workflow |
+| 05 | [RAED](agents/raed.md) | رائد | Product scouting & catalog import | AI model, store catalog API, headless browser |
+| 06 | [KASHEF](agents/kashef.md) | كاشف | SEO & content | AI model, store API, self-calling batch runner |
 | 07 | [FAHES](agents/fahes.md) | فاحص | Technical / blackbox audit | HTTP crawler, link graph |
-| 08 | [DHAWWAQ](agents/dhawwaq.md) | ذواق | Cross-store consistency & UX | Shopify Admin API × 3, diff engine |
-| 09 | [TAJER](agents/tajer.md) | تاجر | Sales pulse / profitability | Shopify Analytics API |
-| 10 | [RASID](agents/rasid.md) | راصد | Google & Meta Ads | Google Ads API, Meta Ads API, Claude |
-| 11 | [WASEL](agents/wasel.md) | واصل | Personal sales follow-up emails | Claude, Shopify discount codes, loyalty connector |
+| 08 | [DHAWWAQ](agents/dhawwaq.md) | ذواق | Cross-store consistency & UX | Store API × 3, diff engine |
+| 09 | [TAJER](agents/tajer.md) | تاجر | Sales pulse / profitability | Store analytics API |
+| 10 | [RASID](agents/rasid.md) | راصد | Google & Meta Ads | Google Ads API, Meta Ads API, AI model |
+| 11 | [WASEL](agents/wasel.md) | واصل | Personal sales follow-up emails | AI model, store discount codes, loyalty connector |
 
-Each page has the agent's brief, its day-to-day tasks, the tools it's built with, and a short, real (sanitized) code excerpt showing the technique — not just a description.
+Each page has the agent's brief, its day-to-day tasks, what it connects to, and a short, sanitized excerpt showing the pattern that keeps it safe — not just a description.
 
 ## Four rules every agent follows
 
@@ -57,21 +57,25 @@ Each page has the agent's brief, its day-to-day tasks, the tools it's built with
 The kill switch is three lines long:
 
 ```js
-// Code node, start of every write-capable workflow
-const state = $('Read Governance State').first().json;
-if (state.systemPaused === 'true') {
-  return [{ json: { skipped: true, reason: 'system paused via /pause' } }];
+// First step of every write-capable automation
+const state = await governance.state();
+if (state.systemPaused) {
+  return { skipped: true, reason: 'system paused via /pause' };
 }
 ```
+
+## Want WAZIR running your store?
+
+The same team can be deployed for another retailer — your catalog, your channels, your rules, your kill switch. **[Get in touch →](https://github.com/a-elradi)**
 
 ## This repo
 
 ```
-agents/          one Markdown brief per agent (what the site's dossiers are built from)
-src/             the showcase site - Vite + React + Framer Motion, no UI framework
+agents/          one brief per agent (what the site's dossiers are built from)
+src/             the showcase site
 public/media/    the film (MP4) and its poster
 media/           the GIF at the top of this page
-.github/         GitHub Pages deploy on every push to main
+.github/         deploys the site on every push to main
 ```
 
 Run it locally:
@@ -81,9 +85,8 @@ npm install
 npm run dev
 ```
 
-The film was produced in [Remotion](https://www.remotion.dev) with an original, procedurally synthesized soundtrack — every cut lands on the beat grid, the same way every agent lands on the audit trail.
+The film was produced entirely in code with an original, procedurally synthesized soundtrack — every cut lands on the beat grid, the same way every agent lands on the audit trail.
 
-## Related
+## A note on what's here
 
-- The companion private repo, `wazir-agent-department`, holds the operational detail: real workflow and table IDs, the governance docs, the ops dashboard.
-- Real agent names, real code patterns, sanitized: no IDs, keys or customer data live here.
+Real agent names, real patterns, sanitized: no IDs, keys or customer data live in this repo, and the engine underneath stays ours. The operational detail lives in a private companion repo.
