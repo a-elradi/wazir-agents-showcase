@@ -1,16 +1,17 @@
 # DHAWWAQ — Cross-Store Consistency & UX
 
-A weekly watchdog making sure sibling storefronts (different country/currency, same brand) actually agree with each other, and that the experience reads well.
+The watchdog making sure sibling storefronts (different country/currency, same brand) actually agree with each other, that nothing is listed twice, and that the experience reads well.
 
 ## Day-to-day tasks
 
-- Compares every storefront against its siblings: products & availability, product content, collections, static pages, policies, homepage and menu.
+- Weekly: compares every storefront against its siblings — products & availability, product content, collections, static pages, policies, homepage and menu.
+- Daily: finds the same product live twice in one store and lists the pairs in the team sheet.
 - Runs a separate UX-focused review of the storefront experience itself.
-- Report-only — findings go to the team for manual action.
+- Report-only — the one write it offers is a "make it a draft" button in the team app that a human presses for a duplicate, with undo.
 
 ## Connects to
 
-Shopify Admin GraphQL API across every storefront, an AI model for content comparison, a reporting channel.
+Shopify Admin GraphQL API across every storefront, an AI model for content comparison, a reporting channel, the team app (duplicates list, make-draft / undo).
 
 ## Excerpt — diffing sibling stores, not just checking one
 

@@ -5,15 +5,15 @@
 <h1 align="center">WAZIR Agent Department</h1>
 
 <p align="center">
-  <strong>One supervisor. Thirteen specialists. Zero idle hands.</strong><br />
-  A 14-agent AI operations team running a three-store fashion retailer day and night.
+  <strong>One supervisor. Twelve specialists. Zero idle hands.</strong><br />
+  A 13-agent AI operations team running a three-store fashion retailer day and night.
 </p>
 
 <p align="center">
   <a href="https://a-elradi.github.io/wazir-agents-showcase/"><img alt="Live site" src="https://img.shields.io/badge/live_site-a--elradi.github.io-800000?style=for-the-badge" /></a>
-  <a href="public/media/wazir-showcase.mp4"><img alt="The film" src="https://img.shields.io/badge/the_film-58_s_·_1080p-111111?style=for-the-badge" /></a>
-  <img alt="Agents" src="https://img.shields.io/badge/agents-14-B8963E?style=for-the-badge" />
-  <img alt="Automations" src="https://img.shields.io/badge/live_automations-81-800000?style=for-the-badge" />
+  <a href="public/media/wazir-showcase.mp4"><img alt="The film" src="https://img.shields.io/badge/the_film-56_s_·_1080p-111111?style=for-the-badge" /></a>
+  <img alt="Agents" src="https://img.shields.io/badge/agents-13-B8963E?style=for-the-badge" />
+  <img alt="Automations" src="https://img.shields.io/badge/live_automations-80-800000?style=for-the-badge" />
 </p>
 
 ---
@@ -24,7 +24,9 @@
 
 ## What WAZIR is
 
-WAZIR (وزير, "the minister") is the only agent the owner talks to. It routes a request to whichever specialist it needs, merges their findings, reports back, and holds the team's kill switch. The thirteen specialists each own one lane — product scouting, SEO, search and AI-engine visibility, technical and UX audits, ad management, refunds, support memory, AI-quality review, sales pulse, personal sales follow-up, brand design and social content — and never step outside it.
+WAZIR (وزير, "the minister") is the only agent the owner talks to. It routes a request to whichever specialist it needs, merges their findings, reports back, and holds the team's kill switch. The twelve specialists each own one lane — product scouting, SEO and AI-engine visibility, technical and UX audits, ad management, refunds, support memory, AI-quality review, personal sales follow-up, WhatsApp order updates and campaigns, brand design and social content — and never step outside it.
+
+WAZIR is also the Head of Sales. Every agent files a daily report; every three days WAZIR chairs a sales meeting where each agent speaks in an expert role, a reality checker challenges the numbers, and WAZIR writes the plan. The CEO or the supervisor approves it in the team app — no approval, no new instructions — and only then does each agent get told what to do differently.
 
 Everything runs on WAZIR's own orchestration engine, thinks with a frontier AI model, and reads and writes through the store (three storefronts), WhatsApp, Instagram, Telegram, email, Google Ads, Meta Ads, Google Sheets and Search Console — behind one governance table and one audit trail.
 
@@ -32,20 +34,19 @@ Everything runs on WAZIR's own orchestration engine, thinks with a frontier AI m
 
 | # | Agent | Arabic | Role | Connects to |
 |---|---|---|---|---|
-| — | [WAZIR](agents/wazir.md) | وزير | Supervisor / CEO interface | Telegram, governance table, store API × 3 |
+| — | [WAZIR](agents/wazir.md) | وزير | Supervisor / Head of Sales | Telegram, governance table, store API × 3, team app |
 | 01 | [NASEEJ](agents/naseej.md) | نسيج | System health & audit trail | Store API, Meta / Microsoft Graph, Telegram |
 | 02 | [HAFEZ](agents/hafez.md) | حافظ | Support knowledge base | AI model, knowledge-base table, Telegram |
-| 03 | [AMEEN](agents/ameen.md) | أمين | Refunds | Sheets queue, idempotent webhook, store API |
+| 03 | [AMEEN](agents/ameen.md) | أمين | Refunds (two signatures) | Sheets queue, idempotent webhook, store API |
 | 04 | [MIZAN](agents/mizan.md) | ميزان | AI quality & ratings | AI model, ratings table, approval workflow |
 | 05 | [RAED](agents/raed.md) | رائد | Product scouting & catalog import | AI model, store catalog API, headless browser |
-| 06 | [KASHEF](agents/kashef.md) | كاشف | SEO & content | AI model, store API, self-calling batch runner |
+| 06 | [KASHEF](agents/kashef.md) | كاشف | SEO, AI search & content | AI model, Search Console, Bing API, store API × 3 |
 | 07 | [FAHES](agents/fahes.md) | فاحص | Technical / blackbox audit | HTTP crawler, link graph |
-| 08 | [DHAWWAQ](agents/dhawwaq.md) | ذواق | Cross-store consistency & UX | Store API × 3, diff engine |
-| 09 | [TAJER](agents/tajer.md) | تاجر | Sales pulse / profitability | Store analytics API |
-| 10 | [RASID](agents/rasid.md) | راصد | Google & Meta Ads | Google Ads API, Meta Ads API, AI model |
-| 11 | [WASEL](agents/wasel.md) | واصل | Personal sales follow-up emails | AI model, store discount codes, loyalty connector |
-| 12 | [DALEEL](agents/daleel.md) | دليل | Search & AI-engine visibility | AI model, Search Console, Bing API, store API × 3 |
-| 13 | [RASSAM](agents/rassam.md) | رسام | Brand design & social content | AI image & video models, design library, Instagram publishing |
+| 08 | [DHAWWAQ](agents/dhawwaq.md) | ذواق | Cross-store consistency, duplicates & UX | Store API × 3, diff engine |
+| 09 | [RASID](agents/rasid.md) | راصد | Google & Meta Ads | Google Ads API, Meta Ads API, AI model |
+| 10 | [WASEL](agents/wasel.md) | واصل | Personal sales follow-up emails, VIPs | AI model, store discount codes, loyalty connector |
+| 11 | [BASHIR](agents/bashir.md) | بشير | WhatsApp manager: order updates & campaigns | WhatsApp Business API × 3, store API, delivery reports |
+| 12 | [RASSAM](agents/rassam.md) | رسام | Brand design & social content | AI image & video models, design library, Instagram publishing |
 
 Each page has the agent's brief, its day-to-day tasks, what it connects to, and a short, sanitized excerpt showing the pattern that keeps it safe — not just a description.
 

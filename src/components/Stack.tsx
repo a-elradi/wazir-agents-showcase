@@ -28,7 +28,7 @@ const pos = ORBIT.map((_, i) => {
 });
 
 const FACTS = [
-  ["81", "live automations"],
+  ["80", "live automations"],
   ["3", "storefronts · KW · BH · US"],
   ["1", "governance table · 1 audit trail"],
 ];

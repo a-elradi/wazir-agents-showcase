@@ -20,17 +20,17 @@ export function OrgChart() {
     <section className="org section section--white" id="org">
       <div className="wrap">
         <Eyebrow>The org chart</Eyebrow>
-        <Words text="14 AI agents. One team." hl={["One", "team."]} className="h2" />
+        <Words text="13 AI agents. One team." hl={["One", "team."]} className="h2" />
         <FadeUp delay={0.2}>
           <p className="lede">
-            WAZIR is the only agent the owner talks to. It routes, merges and reports; the thirteen specialists each own one lane and never
+            WAZIR is the only agent the owner talks to. It routes, merges and reports; the twelve specialists each own one lane and never
             step outside it. Hover a node, click to open its dossier.
           </p>
         </FadeUp>
       </div>
 
       <FadeUp className="org__scroller" amount={0.2}>
-        <svg className="org__svg" viewBox={`0 0 ${W} 520`} role="img" aria-label="WAZIR above thirteen specialist agents, connected by lines">
+        <svg className="org__svg" viewBox={`0 0 ${W} 520`} role="img" aria-label="WAZIR above twelve specialist agents, connected by lines">
           <defs>
             <linearGradient id="orgLine" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stopColor="#800000" />

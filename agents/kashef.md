@@ -1,36 +1,38 @@
-# KASHEF — SEO & Content
+# KASHEF — SEO, AI Search & Content
 
-"Discoverer" — finds what search is missing across the whole catalog, drafts the fix, and (once approved) can apply it at scale.
+"Discoverer" — owns how the stores get found: by Google, by Bing, and by the AI answer engines (classic SEO plus answer-engine and generative-engine optimisation). It fixes products, collections and country links on its own, writes the store blog, logs every change as before / after / why, and never touches ads.
 
 ## Day-to-day tasks
 
-- Scans the entire catalog for missing or weak SEO titles, meta descriptions and image alt text.
-- Drafts a replacement for each flagged product with the model, showing a clear before/after.
-- Applies an approved fix straight to the live product on request.
-- Can run a background "fix everything" pass that works through the whole flagged list in small batches, calling itself until the list is empty — with start/stop/resume control and live progress.
-- Logs every fix, automatic or manual, to a shared sheet the team can audit.
+- Daily search pass over every product added since the last run: title, description, image alt text, the real brand in the brand field, structured data.
+- Weekly AI-visibility test: asks the AI answer engines about the store's categories in English and Arabic, then rewrites the matching collections' titles and descriptions so the store gets named next time — the same collection is not touched again for three weeks.
+- Technical layer across the three storefronts: country links (hreflang) between sibling stores, collection SEO, a weekly read of Search Console and Bing data for pages that almost rank or are losing clicks.
+- Two blog articles a week, planned from each store's best sellers and real customer questions, published to the store blogs.
+- A "fix one product now" button in the team app for the products team, in an SEO-only mode that leaves brand and tags alone.
+- Every change goes to one shared sheet as before / after / why; failed writes keep the old values and are retried by the next run.
 
 ## Connects to
 
-An AI model for SEO copywriting, Shopify Admin GraphQL API (product metafields), a progress-tracking data table for the long-running batch runner, a dashboard with Start/Stop/Resume controls.
+An AI model (a cheaper one for bulk product work, a stronger one for articles and the AI test), Google Search Console API, Bing URL Submission API, Shopify Admin GraphQL on all three storefronts, the team's shared log sheet, the team app.
 
-## Excerpt — a stoppable background batch runner
+## Excerpt — changes on its own, never silently
 
 ```js
-// "Fix All": works 15 products per store per round, checks a stop flag
-// between rounds, and calls itself until the queue is empty
-const ROUND_SIZE = 15;
-const progress = await readProgressRow(runId);
-if (progress.stopRequested) return { stopped: true };
-
-const batch = await getNextUnfixed(storeId, ROUND_SIZE);
-for (const product of batch) await fixOneProduct(product);
-
-await updateProgressRow(runId, { fixedSoFar: progress.fixedSoFar + batch.length });
-
-if (batch.length === ROUND_SIZE) {
-  await callSelf({ runId, storeId }); // more to do — next round
-} else {
-  await markRunComplete(runId);
+// KASHEF may fix a product by itself - but every fix leaves a paper trail.
+const product = await getProduct(storeId, productId);
+if (await fixedRecently(product.id, { days: 21 })) {
+  return { skipped: true, reason: 'touched this month' };
 }
+
+const fix = await proposeSearchFix(product); // title, description, brand, alt text, schema
+await applySearchFix(storeId, product.id, fix);
+
+await logToTeamSheet('kashef', {
+  type: 'product SEO',
+  before: pick(product, ['seoTitle', 'seoDescription', 'vendor']),
+  after: fix,
+  why: fix.rationale, // one sentence a human can audit later
+});
 ```
+
+Theme-level changes are made on a duplicated theme first so they can be rolled back; the main website's theme is off-limits by the owner's rule.

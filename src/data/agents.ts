@@ -1,11 +1,10 @@
 import {
   BrainCircuit,
   Bug,
-  Compass,
   Crown,
   Eye,
-  HandCoins,
   MailCheck,
+  MessageCircleMore,
   Palette,
   Radar,
   Scale,
@@ -33,20 +32,21 @@ export type Agent = {
 export const WAZIR: Agent = {
   key: "WAZIR",
   ar: "وزير",
-  role: "Supervisor · CEO interface",
+  role: "Supervisor · Head of Sales",
   meaning: "the minister, trusted overseer",
   group: "Supervisor",
   Icon: Crown,
   brief:
-    "The orchestrator. Routes a request to whichever specialist it needs, merges their findings, and holds the team's kill switch. Never overrides a restriction placed on another agent.",
+    "The orchestrator and the Head of Sales. Routes a request to whichever specialist it needs, merges their findings, carries the sales target, and holds the team's kill switch. Never overrides a restriction placed on another agent.",
   tasks: [
-    "Answers the team's questions by calling the right specialist's own chat tool",
+    "Chairs a sales meeting every 3 days: each agent speaks in an expert role, a reality checker pushes back, WAZIR writes the plan",
+    "The plan is approved by the CEO or the supervisor in the team app before any agent gets a new instruction",
+    "Reads every agent's daily report and answers the team's questions through each specialist's own chat",
     "Runs /pause · /resume · /status from a Telegram command group",
     "Hands the support bots a customer's sticky account manager, VIP tier and order history",
-    "Holds a hesitant customer's items for 24 h and cleans up expired holds",
-    "Reports real AI spend from the model provider's own cost API",
+    "Holds a hesitant customer's items for 24 h, cleans up expired holds, reports real AI spend from the provider's cost API",
   ],
-  tools: ["Orchestration engine", "Telegram Bot API", "Governance data table", "Shopify Admin GraphQL × 3", "Model-provider cost API", "Management dashboard"],
+  tools: ["Orchestration engine", "Telegram Bot API", "Governance data table", "Shopify Admin GraphQL × 3", "Model-provider cost API", "Team app · one page per role"],
   codeTitle: "The kill-switch read, at the top of every write-capable automation",
   code: `// First step of every write-capable automation
 const state = await governance.state();
@@ -127,9 +127,10 @@ await insertRow(knowledgeBaseTable, {
     tasks: [
       "Receives a refund request only when the bot has established the item arrived damaged or wrong",
       "Logs it to a human-reviewed queue, idempotently — never filed twice",
-      "Carries out the human decision: approve, reject, or manual adjustment",
+      "Two signatures: customer care decides first, the supervisor gives the final approve or reject",
+      "Carries out the final decision: approve, reject, or manual adjustment — and refuses to act on one signature",
     ],
-    tools: ["Google Sheets queue", "Shopify Admin API", "Telegram red alert", "Dashboard approve / reject"],
+    tools: ["Google Sheets queue", "Shopify Admin API", "Telegram red alert", "Team app two-step approval"],
     codeTitle: "Idempotent by construction",
     code: `// Calling this twice for the same order/reason is a no-op.
 const idempotencyKey = \`\${orderId}:\${reasonCode}\`;
@@ -153,16 +154,16 @@ return { ok: true, id: row.id };`,
     meaning: "the scale, weighs every conversation",
     group: "Customer care",
     Icon: Scale,
-    brief: "The nightly reviewer of the support bots' own conversations, and the engine behind the weekly \"what should we teach the bots\" cycle.",
+    brief: "The daily reviewer of the support bots' own conversations, and the engine behind the \"what should we teach the bots\" cycle.",
     tasks: [
-      "Reviews the day's support conversations for quality",
+      "Reviews every day's support conversations for quality and tone",
       "Ties every customer rating back to the conversation that earned it",
-      "Proposes weekly house lessons — a human approves, edits, rejects or retires each one",
+      "Proposes house lessons every day — a human approves, edits, rejects or retires each one",
     ],
     tools: ["AI model", "Ratings table", "House-lessons table (approval state machine)", "Dashboard review UI"],
     codeTitle: "Lessons are proposed, never self-installed",
-    code: `// Weekly proposal run - writes nothing a bot can read yet
-for (const c of await findRecurringIssues(lastWeeksConversations)) {
+    code: `// Daily proposal run - writes nothing a bot can read yet
+for (const c of await findRecurringIssues(yesterdaysConversations)) {
   await insertRow(houseLessonsTable, {
     rule: c.proposedRule,
     evidence: c.exampleConversationIds,
@@ -208,32 +209,35 @@ return { importedThisRun: thisBatch.length, remaining: remaining.length };`,
   {
     key: "KASHEF",
     ar: "كاشف",
-    role: "SEO & content",
+    role: "SEO, AI search & content",
     meaning: "the discoverer, finds what search is missing",
     group: "Growth",
     Icon: SearchCheck,
-    brief: "Finds what search is missing across the whole catalog, drafts the fix, and — once approved — applies it at scale.",
+    brief:
+      "Owns how the stores get found — by Google, Bing and the AI answer engines. Fixes products, collections and country links on its own, writes the blog, logs every change as before / after / why, and never touches ads.",
     tasks: [
-      "Scans every product in 3 stores for weak titles, meta descriptions and alt text",
-      "Drafts a replacement with a clear before / after",
-      "Fix-all background runner works the backlog in small rounds with Stop / Resume",
-      "Every fix logged to a sheet the team can audit",
+      "Daily search pass over every new product: title, description, alt text, the real brand in the brand field, structured data",
+      "Weekly AI-visibility test: asks the AI answer engines about the store's categories in English and Arabic, then rewrites the matching collections so the store gets named",
+      "Country links (hreflang) between sibling stores, collection SEO and Search Console / Bing data across the 3 storefronts",
+      "Two blog articles a week from best sellers and real customer questions, published to the store blogs",
+      "A fix-one-product button in the team app for the products team, SEO-only mode",
+      "Logs every change as before / after / why; never touches ads",
     ],
-    tools: ["AI model", "Shopify Admin GraphQL (metafields)", "Progress data table", "Dashboard Start / Stop / Resume"],
-    codeTitle: "A stoppable background batch runner",
-    code: `const ROUND_SIZE = 15;
-const progress = await readProgressRow(runId);
-if (progress.stopRequested) return { stopped: true };
+    tools: ["AI model", "Search Console API", "Bing URL Submission API", "Shopify Admin GraphQL × 3", "Team log sheet", "Team app button"],
+    codeTitle: "Changes on its own, never silently",
+    code: `// KASHEF may fix a product by itself - but every fix leaves a paper trail.
+const product = await getProduct(storeId, productId);
+if (await fixedRecently(product.id, { days: 21 })) return { skipped: true, reason: 'touched this month' };
 
-const batch = await getNextUnfixed(storeId, ROUND_SIZE);
-for (const product of batch) await fixOneProduct(product);
-await updateProgressRow(runId, { fixedSoFar: progress.fixedSoFar + batch.length });
+const fix = await proposeSearchFix(product); // title, description, brand, alt text, schema
+await applySearchFix(storeId, product.id, fix);
 
-if (batch.length === ROUND_SIZE) {
-  await callSelf({ runId, storeId }); // more to do - next round
-} else {
-  await markRunComplete(runId);
-}`,
+await logToTeamSheet('kashef', {
+  type: 'product SEO',
+  before: pick(product, ['seoTitle', 'seoDescription', 'vendor']),
+  after: fix,
+  why: fix.rationale, // one sentence a human can audit later
+});`,
   },
   {
     key: "FAHES",
@@ -273,13 +277,14 @@ return { checked: seen.size, broken };`,
     meaning: "the connoisseur, judges how the store feels",
     group: "Growth",
     Icon: Eye,
-    brief: "A weekly watchdog making sure sibling storefronts actually agree with each other, and that the experience reads well.",
+    brief: "The watchdog making sure sibling storefronts actually agree with each other, nothing is listed twice, and the experience reads well.",
     tasks: [
-      "Compares every storefront against its siblings: products, content, collections, policies, menus",
+      "Weekly: compares every storefront against its siblings — products, content, collections, policies, menus",
+      "Daily: finds the same product live twice in a store and lists the pairs in the team sheet",
       "Runs a separate UX review of the storefront experience",
-      "Report-only — findings go to the team",
+      "Report-only — the one write is a 'make it a draft' button a human presses, with undo",
     ],
-    tools: ["Shopify Admin GraphQL × 3", "AI model", "Telegram"],
+    tools: ["Shopify Admin GraphQL × 3", "AI model", "Telegram", "Team app make-draft / undo"],
     codeTitle: "Diffing sibling stores, not just checking one",
     code: `const stores = ['kw', 'bh', 'us'];
 const snapshots = await Promise.all(stores.map(fetchStorefrontSnapshot));
@@ -295,33 +300,6 @@ for (const field of ['products', 'collections', 'policies', 'homepage']) {
 return { mismatches }; // report only`,
   },
   {
-    key: "TAJER",
-    ar: "تاجر",
-    role: "Sales & retention",
-    meaning: "the merchant, drives the deal",
-    group: "Sales",
-    Icon: HandCoins,
-    brief: "Keeps a running read on sales and feeds the one shared profitability view every revenue-facing agent reads from.",
-    tasks: [
-      "Pulls sales performance across every storefront on a schedule",
-      "Feeds price, cost of goods, fees, shipping, discount, ad cost and returns into one view — not eight",
-      "Carries a bounded promotion authority: reminders automatic, 5–10 % inside rules, anything bigger needs a human",
-    ],
-    tools: ["Shopify Analytics / Admin GraphQL", "Shared profitability model", "Telegram"],
-    codeTitle: "A promotion decision stays inside its own lane",
-    code: `function authorityFor(action) {
-  if (['recommendation', 'restock_notice', 'cart_reminder'].includes(action.type)) return 'auto';
-  if (action.type === 'discount' && action.percent <= 10 && action.withinApprovedCampaign) return 'auto';
-  return 'needs_human'; // >10%, VIP exception, mass campaign, any price change
-}
-
-if (authorityFor(proposedAction) === 'needs_human') {
-  await raiseForApproval(proposedAction); // never executes itself
-} else {
-  await execute(proposedAction);
-}`,
-  },
-  {
     key: "RASID",
     ar: "راصد",
     role: "Google & Meta Ads",
@@ -330,11 +308,12 @@ if (authorityFor(proposedAction) === 'needs_human') {
     Icon: Radar,
     brief: "Watches ad spend earn its keep — with trust earned in stages, since it carries the most direct financial risk.",
     tasks: [
-      "Ongoing performance monitoring across Google Ads and Meta Ads",
+      "Ongoing performance monitoring across Google Ads and Meta Ads, daily spend fed to the team app",
       "On-demand advisor report, cross-checked line by line against real storefront orders",
+      "Tracks the share of orders that used a discount code, so promotions are judged on margin, not volume",
       "A live chat the team can ask ad questions of, for any date range",
     ],
-    tools: ["Google Ads API", "Meta Ads API", "Shopify Admin GraphQL", "AI model"],
+    tools: ["Google Ads API", "Meta Ads API", "Shopify Admin GraphQL", "AI model", "Team app"],
     codeTitle: "Staged autonomy instead of day-one trust",
     code: `function stageFor(agent) {
   if (agent.daysLive < 30) return 'read_only';          // recommends only
@@ -364,6 +343,7 @@ if (stage === 'read_only') {
       "Finds abandoned checkouts and saved bags across every storefront and opens a journey for each",
       "Plans loyalty-balance, expiry and refill reminders for every customer except opt-outs",
       "Writes each email in the account manager's voice with a one-time personal code",
+      "Keeps the repeat-buyer and VIP list per store — lifetime orders and spend — and treats them accordingly",
       "Reports every couple of hours: sent, waiting, codes issued, orders attributed",
     ],
     tools: ["AI model", "Shopify discount codes", "Loyalty connector", "Journeys data table", "Team results sheet"],
@@ -382,37 +362,34 @@ for (const journey of due) {
 }`,
   },
   {
-    key: "DALEEL",
-    ar: "دليل",
-    role: "Search & AI-engine visibility",
-    meaning: "the guide, points search and AI engines to the store",
-    group: "Growth",
-    Icon: Compass,
+    key: "BASHIR",
+    ar: "بشير",
+    role: "WhatsApp manager",
+    meaning: "the herald, carries every WhatsApp message",
+    group: "Sales",
+    Icon: MessageCircleMore,
     brief:
-      "Owns how the stores get found — by Google, Bing and the AI answer engines. Fixes what it can on its own, logs every change as before / after / why, and stays out of lanes that already have an owner.",
+      "Runs the whole WhatsApp operation: order updates the moment the store changes an order, a thank-you three days after delivery, abandoned-checkout and abandoned-cart cards, and one campaign per customer per month. The team only picks templates and switches cards on.",
     tasks: [
-      "Daily search pass over every new product: titles, descriptions, the real brand in the brand field, structured data",
-      "Reads Search Console and Bing data for quick wins: pages that almost rank, pages losing clicks, 404s to redirect",
-      "Technical layer across the 3 storefronts: hreflang between sibling stores, sitemaps, schema, same-day URL submission",
-      "Weekly AI-visibility test: asks the major answer engines about the store's categories in English and Arabic and tracks who gets named",
-      "Publishes buying guides from real customer questions, max two a week, facts checked against store policy",
-      "Logs every change as before / after / why; skips products KASHEF already fixed; never touches ads",
+      "Order confirmed, shipped (when tracking appears) and delivered cards as soon as the order changes, any hour; thank-you 3 days after delivery",
+      "Abandoned-checkout and abandoned-cart cards one day later, with the product photo and link, daytime only",
+      "One campaign per customer per month by priority: high spenders, repeat buyers, 30–60-day lapsed, fragrance and beauty lovers, everyone else — evenings only",
+      "Reward-balance and refill nudges on WhatsApp in sync with WASEL's emails: same code, same money, same product",
+      "One 10 % code per store per month, created at month start and deleted before the next",
+      "Cleans the lists before each month and reads the delivery reports per number; pauses itself on refusals or a billing problem",
     ],
-    tools: ["AI model", "Search Console API", "Bing URL Submission API", "Shopify Admin GraphQL × 3", "Team log sheet"],
-    codeTitle: "Changes on its own, never silently",
-    code: `// DALEEL may fix a product by itself - but every fix leaves a paper trail.
-const product = await getProduct(storeId, productId);
-if (await alreadyFixedBy('KASHEF', product.id)) return { skipped: true, reason: 'KASHEF owns this one' };
-
-const fix = await proposeSearchFix(product); // title, description, brand, schema
-await applySearchFix(storeId, product.id, fix);
-
-await logToTeamSheet('daleel', {
-  type: 'product SEO',
-  before: pick(product, ['seoTitle', 'seoDescription', 'vendor']),
-  after: fix,
-  why: fix.rationale, // one sentence a human can audit later
-});`,
+    tools: ["WhatsApp Business API × 3 numbers", "Shopify Admin GraphQL", "Meta delivery reports", "Campaign queue tables", "Team app cards"],
+    codeTitle: "One campaign per person per month, no exceptions",
+    code: `// Monthly groups run by priority; a person reached once this month is skipped everywhere else.
+const reached = await monthContacts(store, month); // Set of customer ids
+for (const group of ['high_spenders', 'repeat_buyers', 'lapsed_30_60', 'beauty_lovers', 'everyone_else']) {
+  for (const p of await audience(store, group)) {
+    if (reached.has(p.id) || !p.whatsappOk || stopList.has(p.phone)) continue;
+    await queue({ store, campaign: group, to: p, code: monthlyCode(store, month), window: '18:00-22:00' });
+    reached.add(p.id);
+  }
+}
+// Order updates ignore the monthly cap - and go first on every number.`,
   },
   {
     key: "RASSAM",
@@ -453,16 +430,15 @@ export const agentDoc = (key: string) => `${REPO}/blob/main/agents/${key.toLower
 
 // The cold-open log from the film, reused by the hero terminal and the ticker.
 export const LOG = [
-  "06:00:02  NASEEJ   health check · 81 automations ........... OK",
+  "06:00:02  NASEEJ   health check · 80 automations ........... OK",
   "06:00:05  NASEEJ   AI health check · backup AI ready ....... OK",
   "06:00:09  FAHES    kw.glam-moda.com · links & pages ......... 200",
   "06:00:30  AMEEN    2 refund requests · damaged items",
   "06:00:41  MIZAN    312 chats reviewed · AI score 4.6 / 5",
   "06:01:40  RAED     150 shops + 36 press sources scanned",
-  "06:02:11  KASHEF   drafting SEO title · Rhode Bubble Bag",
-  "06:02:29  DALEEL   14 new products · search-ready · logged",
+  "06:02:11  KASHEF   14 new products · SEO + brand fixed · logged",
   "06:02:48  WASEL    38 follow-up emails · signed by account managers",
-  "06:03:05  TAJER    14-day pulse · VIP customers updated",
+  "06:03:05  BASHIR   9 order updates sent · tonight's campaign queued",
   "06:03:52  RASSAM   3 post drafts ready · awaiting approval",
   "06:04:30  RASID    ads advisor report ready",
   "06:05:12  WAZIR    daily brief ready",

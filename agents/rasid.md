@@ -4,14 +4,15 @@
 
 ## Day-to-day tasks
 
-- Ongoing performance monitoring across ad platforms.
+- Ongoing performance monitoring across ad platforms, with the day's spend fed to the team app.
 - An on-demand, model-written advisor report, cross-checked line by line against real storefront order data rather than trusting the ad platform's own attribution.
+- Tracks the share of orders that used a discount code, so promotions are judged on margin, not on volume.
 - A live chat interface the team can ask ad questions of, for any date range, with its own query path for custom ranges.
 - Historical pulls to seed a full-account performance review.
 
 ## Connects to
 
-Ad-platform reporting APIs (search + social), Shopify Admin GraphQL API for cross-checking real conversions, an AI model for report writing and the chat interface.
+Ad-platform reporting APIs (search + social), Shopify Admin GraphQL API for cross-checking real conversions and discount use, an AI model for report writing and the chat interface, the team app.
 
 ## Excerpt — staged autonomy instead of day-one trust
 

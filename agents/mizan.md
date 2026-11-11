@@ -1,22 +1,22 @@
 # MIZAN — AI Quality & Ratings
 
-The nightly reviewer of the support bots' own conversations, and the engine behind the weekly "what should we teach the bots" proposal cycle.
+The daily reviewer of the support bots' own conversations, and the engine behind the "what should we teach the bots" proposal cycle.
 
 ## Day-to-day tasks
 
-- Reviews the day's support conversations for quality.
+- Reviews every day's support conversations for quality and tone.
 - Ties customer-given ratings back to the specific conversation that earned them.
-- Proposes new "house lessons" drawn from real conversations every week — a human approves, edits, rejects or retires each one before a bot ever sees it.
+- Proposes new "house lessons" drawn from real conversations every day — a human approves, edits, rejects or retires each one before a bot ever sees it.
 
 ## Connects to
 
-An AI model for conversation review, a ratings data table, a house-lessons data table with an approval state machine, a dashboard review UI.
+An AI model for conversation review, a ratings data table, a house-lessons data table with an approval state machine, a review page in the team app.
 
 ## Excerpt — lessons are proposed, never self-installed
 
 ```js
-// Weekly proposal run — writes nothing a bot can read yet
-const candidates = await findRecurringIssues(lastWeeksConversations);
+// Daily proposal run — writes nothing a bot can read yet
+const candidates = await findRecurringIssues(yesterdaysConversations);
 for (const c of candidates) {
   await insertRow(houseLessonsTable, {
     rule: c.proposedRule,
