@@ -49,9 +49,9 @@ function TerminalLog() {
 }
 
 const STATS = [
-  ["13", "AI agents"],
+  ["17", "AI agents"],
   ["3", "storefronts"],
-  ["80", "live automations"],
+  ["82", "live automations"],
   ["1", "kill switch"],
 ];
 
@@ -84,13 +84,14 @@ export function Hero() {
           </motion.div>
           <Words as="h1" className="hero__h1" text="While you sleep, your AI team is already working." hl={["AI", "team"]} delay={0.35} once />
           <motion.p className="hero__lede" initial={SHOT ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 1.1, ease: EASE }}>
-            One supervisor and twelve specialists run product scouting, search and AI visibility, refunds, quality review, ads, WhatsApp,
-            brand design and personal sales follow-up for a three-store fashion retailer. Under one kill switch. On one audit trail.
+            One supervisor and sixteen specialists answer every customer, scout and source product, track every parcel, keep the invoices,
+            fix search and AI visibility, run ads, WhatsApp, brand design and personal sales follow-up for a three-store fashion retailer.
+            Under one kill switch. On one audit trail.
           </motion.p>
           <motion.div className="hero__cta" initial={SHOT ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 1.3, ease: EASE }}>
             <button className="btn btn--light" onClick={() => setOpen(true)}>
               <Play size={18} fill="currentColor" strokeWidth={0} />
-              Watch the film · 56 s
+              Watch the film · 64 s
             </button>
             <a className="btn btn--ghost" href="#team">
               Meet the team

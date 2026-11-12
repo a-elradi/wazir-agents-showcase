@@ -940,7 +940,7 @@ code {
   gap: 20px;
   margin-top: 20px;
 }
-/* 13 specialists in 3 columns leaves one card alone on the last row - centre it. */
+/* 16 specialists in 3 columns leaves one card alone on the last row - centre it. */
 .grid > :nth-child(3n + 1):last-child {
   grid-column: 2;
 }
@@ -1063,6 +1063,10 @@ code {
 .tag--brand {
   background: #f1e7f5;
   color: #5e2b78;
+}
+.tag--operations {
+  background: #e4f0f2;
+  color: #1f5a68;
 }
 @media (max-width: 1000px) {
   .grid {

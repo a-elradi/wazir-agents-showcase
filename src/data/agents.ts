@@ -3,13 +3,17 @@ import {
   Bug,
   Crown,
   Eye,
+  Headset,
   MailCheck,
   MessageCircleMore,
+  PackageSearch,
   Palette,
   Radar,
+  ReceiptText,
   Scale,
   SearchCheck,
   ShieldCheck,
+  ShoppingCart,
   Telescope,
   Workflow,
   type LucideIcon,
@@ -20,7 +24,7 @@ export type Agent = {
   ar: string;
   role: string;
   meaning: string;
-  group: "System" | "Customer care" | "Growth" | "Ads" | "Sales" | "Brand" | "Supervisor";
+  group: "System" | "Customer care" | "Growth" | "Ads" | "Sales" | "Operations" | "Brand" | "Supervisor";
   Icon: LucideIcon;
   brief: string;
   tasks: string[];
@@ -84,6 +88,36 @@ return {
   nextCursor: page.pageInfo.endCursor,
   hasMore: page.pageInfo.hasNextPage,
 };`,
+  },
+  {
+    key: "CS BOTS",
+    ar: "خدمة",
+    role: "Customer-care bots",
+    meaning: "the service, answers every customer",
+    group: "Customer care",
+    Icon: Headset,
+    brief:
+      "The front line. Three AI bots answer every customer on WhatsApp, Instagram and email themselves — in the customer's own language, as the same named account manager every time. They look up orders across the three stores, send product and tracking cards, ask the team when they do not know, and escalate exactly one thing: a damaged or wrong item.",
+    tasks: [
+      "Answers every message on WhatsApp, Instagram and email, around the clock, in the language of the customer's last message",
+      "Greets as the customer's own account manager — the same name every time, handed over by WAZIR",
+      "Looks the order up across all three stores and answers with product and tracking cards, not prose",
+      "When it does not know: tells the customer it is checking, asks the team on Telegram, and passes the reply on itself",
+      "Reads before every reply: ATHAR's sentence for a late parcel, the lessons MIZAN proposed and a human approved, the answers HAFEZ keeps",
+      "Escalates one thing only — a damaged or wrong item — to AMEEN; asks for a rating when the conversation ends",
+    ],
+    tools: ["AI model", "WhatsApp Business API", "Instagram messaging API × 4 accounts", "Mailbox API", "Shopify Admin GraphQL × 3", "Telegram · ask the team"],
+    codeTitle: "Five layers, one reply - and the hard rules win",
+    code: `// What a bot reads before every reply - top wins, and every layer was approved by a human.
+const prompt = joinBlocks(
+  deliveryCase && caseBlock(deliveryCase),  // ATHAR: one exact sentence, no dates, no promises
+  supervisorInstruction,                     // WAZIR's standing instruction (often empty)
+  houseLessons({ state: 'approved' }),       // MIZAN proposed it, a human approved it
+  teamAnswers(customer.question),            // HAFEZ: what the team already answered once
+  basePrompt({ manager: customer.accountManager, language: detectLanguage(message.text) }),
+);
+// The hard rules live in basePrompt and outrank every layer above it:
+// refunds only for a damaged or wrong item, and never a promise the store cannot keep.`,
   },
   {
     key: "HAFEZ",
@@ -176,6 +210,37 @@ const lessons = await queryRows(houseLessonsTable, { status: 'approved' });
 const promptBlock = lessons.length
   ? '[HOUSE LESSONS]\\n' + lessons.map((l, i) => \`\${i + 1}. \${l.rule}\`).join('\\n')
   : '';`,
+  },
+  {
+    key: "ATHAR",
+    ar: "أثر",
+    role: "Order tracking & delivery watch",
+    meaning: "the trace, follows every parcel",
+    group: "Customer care",
+    Icon: PackageSearch,
+    brief:
+      "Follows every order from the supplier to the customer's door. Reads the shipping emails of three mailboxes, links tracking numbers to purchases, watches every shipped order, and opens a case the moment a parcel is late or stuck — with the one sentence the support bots may say about it.",
+    tasks: [
+      "Every 30 minutes reads the new shipping emails from shops, forwarders and couriers: carrier, tracking numbers, stage",
+      "Links each shipment to the purchase and the store order, so the care page shows an order's whole journey",
+      "Every 2 hours checks every shipped order; a shipment with no new step is looked up on the courier's tracking page",
+      "Opens a case at 15 days late, 4 days without a step, a courier problem, or no tracking after 3 days; closes it on delivery",
+      "Gives the support bots one approved English sentence per case — they say exactly that: no dates, refunds or courier names",
+      "Marks a case urgent the moment the customer asks about it; team only, never names a supplier to a customer",
+    ],
+    tools: ["Mailbox API × 3 (read only)", "Shopify Admin GraphQL × 3", "Courier tracking pages", "AI model · one read per email", "Delivery-cases table shared with the bots", "Team app · Care page"],
+    codeTitle: "A case is a rule, not a feeling",
+    code: `// When does a shipment become a case the team must act on?
+function caseFor(s, now) {
+  if (s.delivered) return null;
+  if (!s.tracking && days(now, s.shippedAt) > 3) return { kind: 'no_tracking' };
+  if (/held|customs|returned to shipper|exception/i.test(s.lastStep)) return { kind: 'carrier_problem' };
+  if (days(now, s.lastStepAt) > 4) return { kind: 'stuck' };
+  if (days(now, s.shippedAt) > 15) return { kind: 'late' };
+  return null;
+}
+// Every open case carries one sentence the support bots may say - written once, in English,
+// with no dates, refunds or courier names. The bot repeats it word for word, nothing more.`,
   },
   {
     key: "RAED",
@@ -392,6 +457,67 @@ for (const group of ['high_spenders', 'repeat_buyers', 'lapsed_30_60', 'beauty_l
 // Order updates ignore the monthly cap - and go first on every number.`,
   },
   {
+    key: "MUSHTARI",
+    ar: "مشتري",
+    role: "Purchasing search & stock check",
+    meaning: "the buyer, finds every product's best price",
+    group: "Operations",
+    Icon: ShoppingCart,
+    brief:
+      "For every new order, searches each product across the whole supplier list — more than 190 shops in the Gulf and worldwide — plus the open web, reads price, stock and the exact shade or size on the real product page, and lists every shop cheapest first. The buyer decides and buys; MUSHTARI never pays. It also walks the catalogue against supplier stock, so items nobody can source stop being sold.",
+    tasks: [
+      "Every new order: each product searched on every shop in the supplier list, Gulf and international, plus a web search",
+      "Opens the real product page — exact brand, product, variant — and reads price, sale price and stock; one verdict per shop",
+      "Available, not available, uncertain, check by hand, or skipped with the reason; every list shop appears, cheapest first",
+      "'I bought it' covers several orders and stores in one purchase; the invoice comes by upload, by email, or later",
+      "Stock check: walks the catalogue oldest-first, re-checks sellers every 3 days, lists what is sold out everywhere and what is back",
+      "Reports which shops block it, every day; never buys, never pays, never changes a product",
+    ],
+    tools: ["Shopify Admin GraphQL × 3", "Shop search APIs + headless browser", "AI model · judges product pages", "Web search", "Live FX rates", "Team app · Purchasing page"],
+    codeTitle: "One product, every shop, a verdict the buyer can trust",
+    code: `// Search every shop in the list, read the real page, never check out.
+for (const shop of suppliers.orderedBy('hitRate')) {
+  const page = await openSearch(shop, item.brand, item.title, item.variant);
+  if (page.blocked) { verdicts.push({ shop, status: 'skipped', why: page.reason }); continue; }
+  const read = await judgeProductPage(page, item); // exact variant? price? in stock? add-to-cart live?
+  verdicts.push({
+    shop, url: read.url, price: toUSD(read.price, read.currency),
+    status: !read.exactMatch ? 'uncertain' : read.inStock ? 'available' : 'not_available',
+  });
+}
+return verdicts.sort(cheapestFirst); // the buyer decides - MUSHTARI never pays`,
+  },
+  {
+    key: "DAFTAR",
+    ar: "دفتر",
+    role: "Invoices & accounts",
+    meaning: "the ledger, keeps every invoice",
+    group: "Operations",
+    Icon: ReceiptText,
+    brief:
+      "The accountant's agent. Turns every purchase invoice — PDF, photo or order email — into the same clean fields, checks the total against what the buyer recorded, lists purchases still waiting for an invoice, finds the ones that arrive by email, and exports the lot to the team's accounting sheet on one click. Only the accountant sees it.",
+    tasks: [
+      "Reads each invoice once: supplier, reference, number, date, currency, subtotal, shipping, tax, discount, total, payment (never the full card), items",
+      "Flags a total more than 1 % off the buyer's recorded cost, a low-confidence read, or a file that is not an invoice",
+      "Finds invoices that 'come by email': searches three mailboxes by reference first, then by shop and date",
+      "Keeps the file and the text side by side, linked to the purchase and to every store order it covers",
+      "Lists purchases still waiting for an invoice",
+      "One Export button writes everything to the accounting sheet; only the accountant sees the page",
+    ],
+    tools: ["AI model · structured output", "Mailbox API × 3 (read only)", "Team app file store", "Purchases table", "Google Sheets export"],
+    codeTitle: "Read once, checked against the buyer's own number",
+    code: `// Every invoice becomes the same row - and the row is checked, not trusted.
+const read = await readInvoice(file, { schema: INVOICE_FIELDS }); // one structured pass
+const purchase = await purchaseFor(read.supplierRef, read.ourOrders);
+const status =
+  !read.isInvoice ? 'not_an_invoice' :
+  read.confidence < 0.7 ? 'check' :
+  purchase && Math.abs(read.total - purchase.cost) / purchase.cost > 0.01 ? 'check' :
+  'read';
+await saveInvoice({ ...read, purchaseId: purchase?.id, status, payment: maskCard(read.payment) });
+// 'check' rows wait for the accountant; 'read' rows go straight into the export.`,
+  },
+  {
     key: "RASSAM",
     ar: "رسام",
     role: "Brand design & social content",
@@ -426,19 +552,24 @@ export const ALL = [WAZIR, ...TEAM];
 
 export const REPO = "https://github.com/a-elradi/wazir-agents-showcase";
 export const CONTACT = "https://github.com/a-elradi";
-export const agentDoc = (key: string) => `${REPO}/blob/main/agents/${key.toLowerCase()}.md`;
+export const agentSlug = (key: string) => key.toLowerCase().replace(/\s+/g, "-"); // "CS BOTS" -> cs-bots
+export const agentDoc = (key: string) => `${REPO}/blob/main/agents/${agentSlug(key)}.md`;
 
 // The cold-open log from the film, reused by the hero terminal and the ticker.
 export const LOG = [
-  "06:00:02  NASEEJ   health check · 80 automations ........... OK",
+  "06:00:02  NASEEJ   health check · 82 automations ........... OK",
   "06:00:05  NASEEJ   AI health check · backup AI ready ....... OK",
   "06:00:09  FAHES    kw.glam-moda.com · links & pages ......... 200",
+  "06:00:18  CS BOTS  41 chats answered overnight · 2 asked the team",
   "06:00:30  AMEEN    2 refund requests · damaged items",
   "06:00:41  MIZAN    312 chats reviewed · AI score 4.6 / 5",
+  "06:00:55  ATHAR    14 parcels watched · 1 late · case opened",
   "06:01:40  RAED     150 shops + 36 press sources scanned",
   "06:02:11  KASHEF   14 new products · SEO + brand fixed · logged",
+  "06:02:30  MUSHTARI 6 new orders · 23 products priced at 190 shops",
   "06:02:48  WASEL    38 follow-up emails · signed by account managers",
   "06:03:05  BASHIR   9 order updates sent · tonight's campaign queued",
+  "06:03:20  DAFTAR   4 invoices read · 1 total to check",
   "06:03:52  RASSAM   3 post drafts ready · awaiting approval",
   "06:04:30  RASID    ads advisor report ready",
   "06:05:12  WAZIR    daily brief ready",

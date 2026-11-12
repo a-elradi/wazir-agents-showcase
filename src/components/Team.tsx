@@ -2,7 +2,7 @@ import { SHOT } from "../shot";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { TEAM, WAZIR, agentDoc, type Agent } from "../data/agents";
+import { TEAM, WAZIR, agentDoc, agentSlug, type Agent } from "../data/agents";
 import { Code, EASE, Eyebrow, FadeUp, Pill, Words, cx, useTyped } from "./ui";
 
 function Dossier({ agent, onClose }: { agent: Agent; onClose: () => void }) {
@@ -84,7 +84,7 @@ function Card({ agent, n, onOpen }: { agent: Agent; n: number; onOpen: () => voi
   return (
     <motion.button
       type="button"
-      id={`agent-${agent.key}`}
+      id={`agent-${agentSlug(agent.key)}`}
       className="card"
       layoutId={`card-${agent.key}`}
       onClick={onOpen}
@@ -123,7 +123,7 @@ export function Team() {
     <section className="team section section--paper" id="team">
       <div className="wrap">
         <Eyebrow>The team</Eyebrow>
-        <Words text="Twelve specialists. Each owns one lane." hl={["one", "lane."]} className="h2" />
+        <Words text="Sixteen specialists. Each owns one lane." hl={["one", "lane."]} className="h2" />
         <FadeUp delay={0.2}>
           <p className="lede">
             Every agent has a real Arabic name that says what it does. Open a dossier for the day-to-day tasks, the tools it's built with,
@@ -131,7 +131,7 @@ export function Team() {
           </p>
         </FadeUp>
 
-        <motion.button type="button" className="lead" id={`agent-${WAZIR.key}`} layoutId={`card-${WAZIR.key}`} onClick={() => setOpen(WAZIR)} initial={SHOT ? false : { opacity: 0, y: 36 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.7, ease: EASE }}>
+        <motion.button type="button" className="lead" id={`agent-${agentSlug(WAZIR.key)}`} layoutId={`card-${WAZIR.key}`} onClick={() => setOpen(WAZIR)} initial={SHOT ? false : { opacity: 0, y: 36 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.7, ease: EASE }}>
           <div className="lead__left">
             <span className="seal seal--light">
               <WAZIR.Icon size={28} strokeWidth={1.6} />

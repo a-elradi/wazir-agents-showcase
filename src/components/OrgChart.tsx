@@ -1,36 +1,40 @@
 import { SHOT } from "../shot";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { TEAM, WAZIR, type Agent } from "../data/agents";
+import { TEAM, WAZIR, agentSlug, type Agent } from "../data/agents";
 import { EASE, Eyebrow, FadeUp, Words } from "./ui";
 
 const W = 1360;
-const TOP = { x: W / 2, y: 96 };
-const NODE_Y = 400;
+const H = 724;
+const TOP = { x: W / 2, y: 176 };
+const ROW_Y = [396, 606]; // sixteen specialists zigzag over two rows: even index up, odd index down
 const R = 38;
-const xs = TEAM.map((_, i) => 80 + (i * (W - 160)) / (TEAM.length - 1));
-const pathFor = (x: number) => `M ${TOP.x} ${TOP.y + 70} C ${TOP.x} ${TOP.y + 200}, ${x} ${NODE_Y - 180}, ${x} ${NODE_Y - R - 4}`;
+const PITCH = (W - 160) / (TEAM.length - 1);
+const POS = TEAM.map((_, i) => ({ x: 80 + i * PITCH, y: ROW_Y[i % ROW_Y.length] }));
+// Each line leaves the crown sideways, then drops straight down onto its node, so the lines to the
+// lower row pass between the upper row's nodes instead of through them.
+const pathFor = (p: { x: number; y: number }) => `M ${TOP.x} ${TOP.y} C ${p.x} ${TOP.y + 20}, ${p.x} ${TOP.y + 80}, ${p.x} ${p.y - R - 4}`;
 
 export function OrgChart() {
   const [hover, setHover] = useState<Agent | null>(null);
   const focus = hover ?? WAZIR;
-  const go = (a: Agent) => document.getElementById(`agent-${a.key}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+  const go = (a: Agent) => document.getElementById(`agent-${agentSlug(a.key)}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
 
   return (
     <section className="org section section--white" id="org">
       <div className="wrap">
         <Eyebrow>The org chart</Eyebrow>
-        <Words text="13 AI agents. One team." hl={["One", "team."]} className="h2" />
+        <Words text="17 AI agents. One team." hl={["One", "team."]} className="h2" />
         <FadeUp delay={0.2}>
           <p className="lede">
-            WAZIR is the only agent the owner talks to. It routes, merges and reports; the twelve specialists each own one lane and never
+            WAZIR is the only agent the owner talks to. It routes, merges and reports; the sixteen specialists each own one lane and never
             step outside it. Hover a node, click to open its dossier.
           </p>
         </FadeUp>
       </div>
 
       <FadeUp className="org__scroller" amount={0.2}>
-        <svg className="org__svg" viewBox={`0 0 ${W} 520`} role="img" aria-label="WAZIR above twelve specialist agents, connected by lines">
+        <svg className="org__svg" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="WAZIR above sixteen specialist agents in two rows, connected by lines">
           <defs>
             <linearGradient id="orgLine" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stopColor="#800000" />
@@ -39,7 +43,7 @@ export function OrgChart() {
           </defs>
 
           {TEAM.map((a, i) => {
-            const d = pathFor(xs[i]);
+            const d = pathFor(POS[i]);
             const on = hover?.key === a.key;
             const dim = hover && !on;
             return (
@@ -69,25 +73,25 @@ export function OrgChart() {
             <circle cx={TOP.x} cy={TOP.y} r={62} fill="#800000" />
             <WAZIR.Icon x={TOP.x - 28} y={TOP.y - 28} width={56} height={56} color="#fff" strokeWidth={1.6} />
           </motion.g>
-          <text x={TOP.x + 86} y={TOP.y - 14} className="org__ar" fill="#800000">
+          <text x={TOP.x} y={50} textAnchor="middle" className="org__ar" fill="#800000">
             {WAZIR.ar}
           </text>
-          <text x={TOP.x + 86} y={TOP.y + 14} className="org__key">
+          <text x={TOP.x} y={74} textAnchor="middle" className="org__key">
             WAZIR
           </text>
-          <text x={TOP.x + 86} y={TOP.y + 36} className="org__role">
+          <text x={TOP.x} y={94} textAnchor="middle" className="org__role">
             Supervisor · your single contact
           </text>
 
           {TEAM.map((a, i) => {
-            const x = xs[i];
+            const { x, y } = POS[i];
             const on = hover?.key === a.key;
             const dim = hover && !on;
             return (
               <motion.g
                 key={a.key}
                 className="org__node"
-                style={{ cursor: "pointer", transformOrigin: `${x}px ${NODE_Y}px` }}
+                style={{ cursor: "pointer", transformOrigin: `${x}px ${y}px` }}
                 initial={SHOT ? false : { opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.4 }}
@@ -101,12 +105,12 @@ export function OrgChart() {
                 role="button"
                 aria-label={`${a.key} - ${a.role}`}
               >
-                <circle cx={x} cy={NODE_Y} r={R} fill="#fff" stroke={on ? "#800000" : "#E4C6C6"} strokeWidth={2.5} opacity={dim ? 0.45 : 1} />
-                <a.Icon x={x - 17} y={NODE_Y - 17} width={34} height={34} color="#800000" strokeWidth={1.7} opacity={dim ? 0.45 : 1} />
-                <text x={x} y={NODE_Y + 66} textAnchor="middle" className="org__key" opacity={dim ? 0.45 : 1}>
+                <circle cx={x} cy={y} r={R} fill="#fff" stroke={on ? "#800000" : "#E4C6C6"} strokeWidth={2.5} opacity={dim ? 0.45 : 1} />
+                <a.Icon x={x - 17} y={y - 17} width={34} height={34} color="#800000" strokeWidth={1.7} opacity={dim ? 0.45 : 1} />
+                <text x={x} y={y + 66} textAnchor="middle" className="org__key" opacity={dim ? 0.45 : 1}>
                   {a.key}
                 </text>
-                <text x={x} y={NODE_Y + 98} textAnchor="middle" className="org__ar" fill="#800000" opacity={dim ? 0.45 : 1}>
+                <text x={x} y={y + 98} textAnchor="middle" className="org__ar" fill="#800000" opacity={dim ? 0.45 : 1}>
                   {a.ar}
                 </text>
               </motion.g>
